@@ -2,14 +2,11 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <!-- Add viewport meta tag for responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Linkedin Job Search Tool</title>
   <style>
     /* Basic reset for padding and margins */
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
       background-color: #e9ecef;
@@ -25,14 +22,14 @@
       background-color: #f5f5f5;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 500px;
       margin-bottom: 20px;
     }
     h2 {
       text-align: center;
-      color: #0073b1;  /* Same blue as the button */
+      color: #0073b1;
     }
     label {
       display: block;
@@ -46,39 +43,17 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Placeholder styling for modern browsers */
-    ::placeholder {
-      color: #aaa;
-    }
-    /* Vendor prefixes for placeholders */
-    ::-webkit-input-placeholder {
-      color: #aaa;
-    }
-    :-moz-placeholder {
-      color: #aaa;
-      opacity: 1;
-    }
-    ::-moz-placeholder {
-      color: #aaa;
-      opacity: 1;
-    }
-    :-ms-input-placeholder {
-      color: #aaa;
-    }
-    /* Style disabled options in selects to be lighter grey */
-    option[disabled] {
-      color: #aaa;
-    }
-    /* The custom geoId div styling */
-    #customGeoDiv {
-      margin-top: 10px;
-      display: none;
-    }
-    /* Distance container styling */
-    #distanceDiv {
-      margin-top: 15px;
-    }
-    /* Button styling on its own row */
+    ::placeholder { color: #aaa; }
+    ::-webkit-input-placeholder { color: #aaa; }
+    :-moz-placeholder { color: #aaa; opacity: 1; }
+    ::-moz-placeholder { color: #aaa; opacity: 1; }
+    :-ms-input-placeholder { color: #aaa; }
+    option[disabled] { color: #aaa; }
+    /* Custom geoId div */
+    #customGeoDiv { margin-top: 10px; display: none; }
+    /* Distance container */
+    #distanceDiv { margin-top: 15px; }
+    /* Button container */
     .button-container {
       text-align: center;
       margin-top: 20px;
@@ -92,20 +67,11 @@
       color: #fff;
       border-radius: 4px;
     }
-    button:hover {
-      background-color: #005582;
-    }
-    /* Responsive adjustments */
+    button:hover { background-color: #005582; }
     @media (max-width: 600px) {
-      .container {
-        padding: 15px;
-      }
-      input, select {
-        padding: 8px;
-      }
-      button {
-        padding: 8px 16px;
-      }
+      .container { padding: 15px; }
+      input, select { padding: 8px; }
+      button { padding: 8px 16px; }
     }
   </style>
 </head>
@@ -177,9 +143,7 @@
   <script>
     // Update display based on location selection
     document.getElementById('location').addEventListener('change', function() {
-      // Show custom geoId if "Other" is selected
       document.getElementById('customGeoDiv').style.display = (this.value === 'Other') ? 'block' : 'none';
-      // Hide distance field if "Remote" is selected; otherwise, show it.
       document.getElementById('distanceDiv').style.display = (this.value === 'Remote') ? 'none' : 'block';
     });
 
@@ -204,17 +168,18 @@
         geoId = document.getElementById('customGeoId').value.trim();
       }
 
-      // Include distance if a radius is selected (placed right after geoId)
       const distanceParam = radiusValue ? `&distance=${radiusValue}` : '';
-
-      // Include location parameter only for valid selections (non-default, and not Remote or Other)
       const locationParam = (locationValue === "" || locationValue === "Remote" || locationValue === "Other") ? "" : `&location=${encodeURIComponent(locationText)}`;
-
-      // Construct final URL with distance right after geoId
       const finalUrl = `https://www.linkedin.com/jobs/search/?f_TPR=${time}${geoId ? `&geoId=${geoId}` : ""}${distanceParam}${remoteParam}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
 
-      // Open the constructed URL in a new tab
-      window.open(finalUrl, "_blank");
+      // Create a temporary anchor element to open in a new tab
+      const a = document.createElement('a');
+      a.href = finalUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   </script>
 </body>
