@@ -78,7 +78,6 @@
 <body>
   <div class="container">
     <h2>Linkedin Job Search Tool</h2>
-
     <label for="location">Location:</label>
     <select id="location">
       <option value="" disabled selected>Enter Location</option>
@@ -98,13 +97,11 @@
       <option value="105080838">New York, NY</option>
       <option value="Other">Other</option>
     </select>
-
     <!-- Custom geoId field appears only if "Other" is selected -->
     <div id="customGeoDiv">
       <label for="customGeoId">Enter Linkedin geoid:</label>
       <input type="text" id="customGeoId" placeholder="Enter Linkedin geoid">
     </div>
-
     <!-- Distance container -->
     <div id="distanceDiv">
       <label for="radius">Distance:</label>
@@ -117,10 +114,8 @@
         <option value="100">100mi</option>
       </select>
     </div>
-
     <label for="keywords">Keywords:</label>
     <input type="text" id="keywords" placeholder="ex. project manager">
-
     <label for="time">Filter by Time:</label>
     <select id="time">
       <option value="r86400">Past 24 Hours</option>
@@ -128,27 +123,21 @@
       <option value="r259200">Past 72 Hours</option>
       <option value="r604800">Past Week</option>
     </select>
-
     <label for="sort">Sort By:</label>
     <select id="sort">
       <option value="DD">Date Posted</option>
       <option value="R">Relevance</option>
     </select>
-
     <div class="button-container">
       <button onclick="buildUrl()">Search</button>
     </div>
   </div>
-
   <script>
-    // Update display based on location selection
     document.getElementById('location').addEventListener('change', function() {
       document.getElementById('customGeoDiv').style.display = (this.value === 'Other') ? 'block' : 'none';
       document.getElementById('distanceDiv').style.display = (this.value === 'Remote') ? 'none' : 'block';
     });
-
     function buildUrl() {
-      // Get input values
       const locationSelect = document.getElementById('location');
       const locationValue = locationSelect.value;
       const locationText = locationSelect.options[locationSelect.selectedIndex].text;
@@ -157,8 +146,6 @@
       const keywords = encodeURIComponent(document.getElementById('keywords').value.trim());
       const time = document.getElementById('time').value;
       const sort = document.getElementById('sort').value;
-
-      // Determine geoId and remote parameter
       let geoId = locationValue;
       let remoteParam = "";
       if (locationValue === "Remote") {
@@ -167,19 +154,10 @@
       } else if (locationValue === "Other") {
         geoId = document.getElementById('customGeoId').value.trim();
       }
-
       const distanceParam = radiusValue ? `&distance=${radiusValue}` : '';
       const locationParam = (locationValue === "" || locationValue === "Remote" || locationValue === "Other") ? "" : `&location=${encodeURIComponent(locationText)}`;
       const finalUrl = `https://www.linkedin.com/jobs/search/?f_TPR=${time}${geoId ? `&geoId=${geoId}` : ""}${distanceParam}${remoteParam}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
-
-      // Create a temporary anchor element to open in a new tab
-      const a = document.createElement('a');
-      a.href = finalUrl;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      window.location.href = finalUrl;
     }
   </script>
 </body>
