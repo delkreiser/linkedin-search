@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Linkedin Job Search Tool</title>
+  <style>
+    /* Basic reset for padding and margins */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e9ecef;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    /* Container styling for the form */
+    .container {
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #0073b1;  /* Same blue as the button */
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input, select {
+      margin-top: 5px;
+      padding: 10px;
+      font-size: 1em;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* Placeholder styling for modern browsers */
+    ::placeholder {
+      color: #aaa;
+    }
+    /* Vendor prefixes for placeholders */
+    ::-webkit-input-placeholder {
+      color: #aaa;
+    }
+    :-moz-placeholder {
+      color: #aaa;
+      opacity: 1;
+    }
+    ::-moz-placeholder {
+      color: #aaa;
+      opacity: 1;
+    }
+    :-ms-input-placeholder {
+      color: #aaa;
+    }
+    /* Style disabled options in selects to be lighter grey */
+    option[disabled] {
+      color: #aaa;
+    }
+    /* The custom geoId div styling */
+    #customGeoDiv {
+      margin-top: 10px;
+      display: none;
+    }
+    /* Distance container styling */
+    #distanceDiv {
+      margin-top: 15px;
+    }
+    /* Button styling on its own row */
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      background-color: #0073b1;
+      color: #fff;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #005582;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      input, select {
+        padding: 8px;
+      }
+      button {
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Linkedin Job Search Tool</h2>
+
+    <label for="location">Location:</label>
+    <select id="location">
+      <option value="" disabled selected>Enter Location</option>
+      <option value="Remote">Remote</option>
+      <option value="102597912">Boulder, CO</option>
+      <option value="103736294">Denver, CO</option>
+      <option value="105763813">Colorado</option>
+      <option value="106233382">San Jose, CA</option>
+      <option value="105865430">Lexington Park, MD</option>
+      <option value="104116203">Seattle, WA</option>
+      <option value="104383890">Washington DC</option>
+      <option value="103755962">Bloomington, IL</option>
+      <option value="105142920">Huntsville, AL</option>
+      <option value="101915197">Durham, NC</option>
+      <option value="102277331">San Francisco, CA</option>
+      <option value="104472865">Austin, TX</option>
+      <option value="105080838">New York, NY</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <!-- Custom geoId field appears only if "Other" is selected -->
+    <div id="customGeoDiv">
+      <label for="customGeoId">Enter Linkedin geoId:</label>
+      <input type="text" id="customGeoId" placeholder="Enter Linkedin geoid">
+    </div>
+
+    <!-- Distance container -->
+    <div id="distanceDiv">
+      <label for="radius">Distance:</label>
+      <select id="radius">
+        <option value="" disabled selected>Enter Distance</option>
+        <option value="5">5mi</option>
+        <option value="10">10mi</option>
+        <option value="25">25mi</option>
+        <option value="50">50mi</option>
+        <option value="100">100mi</option>
+      </select>
+    </div>
+
+    <label for="keywords">Keywords:</label>
+    <input type="text" id="keywords" placeholder="ex. project manager">
+
+    <label for="time">Filter by Time:</label>
+    <select id="time">
+      <option value="r86400">Past 24 Hours</option>
+      <option value="r172800">Past 48 Hours</option>
+      <option value="r259200">Past 72 Hours</option>
+      <option value="r604800">Past Week</option>
+    </select>
+
+    <label for="sort">Sort By:</label>
+    <select id="sort">
+      <option value="DD">Date Posted</option>
+      <option value="R">Relevance</option>
+    </select>
+
+    <div class="button-container">
+      <button onclick="buildUrl()">Search</button>
+    </div>
+  </div>
+
+  <script>
+    // Update display based on location selection
+    document.getElementById('location').addEventListener('change', function() {
+      // Show custom geoId if "Other" is selected
+      document.getElementById('customGeoDiv').style.display = (this.value === 'Other') ? 'block' : 'none';
+      // Hide distance field if "Remote" is selected; otherwise, show it.
+      document.getElementById('distanceDiv').style.display = (this.value === 'Remote') ? 'none' : 'block';
+    });
+
+    function buildUrl() {
+      // Get input values
+      const locationSelect = document.getElementById('location');
+      const locationValue = locationSelect.value;
+      const locationText = locationSelect.options[locationSelect.selectedIndex].text;
+      const radiusSelect = document.getElementById('radius');
+      const radiusValue = radiusSelect.value;
+      const keywords = encodeURIComponent(document.getElementById('keywords').value.trim());
+      const time = document.getElementById('time').value;
+      const sort = document.getElementById('sort').value;
+
+      // Determine geoId and remote parameter
+      let geoId = locationValue;
+      let remoteParam = "";
+      if (locationValue === "Remote") {
+        geoId = "";
+        remoteParam = "&f_WT=2";
+      } else if (locationValue === "Other") {
+        geoId = document.getElementById('customGeoId').value.trim();
+      }
+
+      // Include distance if a radius is selected (placed right after geoId)
+      const distanceParam = radiusValue ? `&distance=${radiusValue}` : '';
+
+      // Include location parameter only for valid selections (non-default, and not Remote or Other)
+      const locationParam = (locationValue === "" || locationValue === "Remote" || locationValue === "Other") ? "" : `&location=${encodeURIComponent(locationText)}`;
+
+      // Construct final URL with distance right after geoId
+      const finalUrl = `https://www.linkedin.com/jobs/search/?f_TPR=${time}${geoId ? `&geoId=${geoId}` : ""}${distanceParam}${remoteParam}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
+
+      // Open the constructed URL in a new tab
+      window.open(finalUrl, "_blank");
+    }
+  </script>
+</body>
+</html>
