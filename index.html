@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Linkedin Job Search Tool</title>
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -53,14 +54,66 @@
     option[disabled] { color: #aaa; }
     /* Experience Level dropdown styling */
     #experience {
-      /* Inherits the same styles as other dropdowns */
+      /* Inherits the same styling as other dropdowns */
     }
     /* Custom geoId div */
     #customGeoDiv { margin-top: 10px; display: none; }
     #distanceDiv { margin-top: 15px; }
+    /* Additional Filters Toggle Switches */
+    .toggle-container {
+      margin-top: 0px; /* Reduced vertical gap */
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .toggle-label {
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+      margin-left: 8px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #0073b1;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
     .button-container {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 30px;
     }
     button {
       padding: 10px 20px;
@@ -156,6 +209,25 @@
         <option value="R">Relevance</option>
       </select>
       
+      <!-- Additional Filters Section -->
+      <label class="section-title">Additional Filters:</label>
+      <div class="toggle-container">
+        <label class="toggle-label">
+          Under 10 applicants:
+          <div class="toggle-switch">
+            <input type="checkbox" id="toggleUnder10">
+            <span class="slider"></span>
+          </div>
+        </label>
+        <label class="toggle-label">
+          In your network:
+          <div class="toggle-switch">
+            <input type="checkbox" id="toggleNetwork">
+            <span class="slider"></span>
+          </div>
+        </label>
+      </div>
+      
       <div class="button-container">
         <button onclick="buildUrl()">Search</button>
       </div>
@@ -174,7 +246,7 @@
     function buildUrl() {
       const keywords = encodeURIComponent(document.getElementById('keywords').value.trim());
       
-      // Get Experience Level value from the dropdown.
+      // Get Experience Level from dropdown.
       const expSelect = document.getElementById('experience');
       const expValue = expSelect.value;
       let f_E_param = "";
@@ -203,7 +275,17 @@
       const time = document.getElementById('time').value;
       const sort = document.getElementById('sort').value;
       
-      const finalUrl = `https://www.linkedin.com/jobs/search/?f_TPR=${time}${geoId ? `&geoId=${geoId}` : ""}${distanceParam}${f_WT_param}${f_E_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
+      // Additional Toggle Parameters
+      let f_EA_param = "";
+      if (document.getElementById('toggleUnder10').checked) {
+        f_EA_param = "&f_EA=true";
+      }
+      let f_JIYN_param = "";
+      if (document.getElementById('toggleNetwork').checked) {
+        f_JIYN_param = "&f_JIYN=true";
+      }
+      
+      const finalUrl = `https://www.linkedin.com/jobs/search/?f_TPR=${time}${geoId ? `&geoId=${geoId}` : ""}${distanceParam}${f_EA_param}${f_JIYN_param}${f_WT_param}${f_E_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
       
       const a = document.createElement('a');
       a.href = finalUrl;
