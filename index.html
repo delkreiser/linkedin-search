@@ -61,7 +61,7 @@
     #distanceDiv { margin-top: 15px; }
     /* Additional Filters Toggle Switches */
     .toggle-container {
-      margin-top: 0px; /* Reduced vertical gap */
+      margin-top: 0px;  /* Reduced vertical gap */
       display: flex;
       gap: 20px;
       align-items: center;
@@ -196,6 +196,10 @@
       <!-- Filter by Time Section -->
       <label class="section-title" for="time">Filter by Time:</label>
       <select id="time">
+        <option value="" disabled selected style="color:#aaa;">Select Time</option>
+        <option value="r1800">Past 30 Minutes</option>
+        <option value="r3600">Past Hour</option>
+        <option value="r7200">Past 2 Hours</option>
         <option value="r86400">Past 24 Hours</option>
         <option value="r172800">Past 48 Hours</option>
         <option value="r259200">Past 72 Hours</option>
@@ -235,7 +239,7 @@
   </div>
   
   <script>
-    // When location changes, show/hide custom geoId and distance fields.
+    // When location changes, show/hide custom geoID and distance fields.
     document.getElementById('location').addEventListener('change', function () {
       const isOther = this.value === 'Other';
       const isRemote = this.value === 'Remote';
