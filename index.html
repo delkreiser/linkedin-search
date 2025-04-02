@@ -54,16 +54,20 @@
     option[disabled] { color: #aaa; }
     /* Experience Level dropdown styling */
     #experience {
-      /* Inherits the same styling as other dropdowns */
+      /* Inherits styling from other dropdowns */
     }
     /* Custom geoId div */
     #customGeoDiv { margin-top: 10px; display: none; }
     #distanceDiv { margin-top: 15px; }
-    /* Additional Filters Toggle Switches */
-    .toggle-container {
-      margin-top: 0px;  /* Reduced vertical gap */
+    /* Additional Filters - Two Column Layout */
+    .toggle-table {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;  /* Both row and column gap */
+      margin-top: 	px;
+    }
+    .toggle-cell {
       display: flex;
-      gap: 20px;
       align-items: center;
     }
     .toggle-label {
@@ -213,23 +217,39 @@
         <option value="R">Relevance</option>
       </select>
       
-      <!-- Additional Filters Section -->
+      <!-- Additional Filters Section (placed after Sort By) -->
       <label class="section-title">Additional Filters:</label>
-      <div class="toggle-container">
-        <label class="toggle-label">
-          Under 10 applicants:
-          <div class="toggle-switch">
-            <input type="checkbox" id="toggleUnder10">
-            <span class="slider"></span>
-          </div>
-        </label>
-        <label class="toggle-label">
-          In your network:
-          <div class="toggle-switch">
-            <input type="checkbox" id="toggleNetwork">
-            <span class="slider"></span>
-          </div>
-        </label>
+      <div class="toggle-table">
+        <div class="toggle-cell">
+          <label class="toggle-label">
+            Under 10 applicants:
+            <div class="toggle-switch">
+              <input type="checkbox" id="toggleUnder10">
+              <span class="slider"></span>
+            </div>
+          </label>
+        </div>
+        <div class="toggle-cell">
+          <label class="toggle-label">
+            In your network:
+            <div class="toggle-switch">
+              <input type="checkbox" id="toggleNetwork">
+              <span class="slider"></span>
+            </div>
+          </label>
+        </div>
+        <div class="toggle-cell">
+<label class="toggle-label">
+            FAANG:
+            <div class="toggle-switch">
+              <input type="checkbox" id="toggleFAANG">
+              <span class="slider"></span>
+</div>
+        <div class="toggle-cell">
+          
+            </div>
+          </label>
+        </div>
       </div>
       
       <div class="button-container">
@@ -288,8 +308,12 @@
       if (document.getElementById('toggleNetwork').checked) {
         f_JIYN_param = "&f_JIYN=true";
       }
+      let f_C_param = "";
+      if (document.getElementById('toggleFAANG').checked) {
+        f_C_param = "&f_C=" + encodeURIComponent("165158,1586,1441,8074624,10667,162479");
+      }
       
-      const finalUrl = `https://www.linkedin.com/jobs/search/?f_TPR=${time}${geoId ? `&geoId=${geoId}` : ""}${distanceParam}${f_EA_param}${f_JIYN_param}${f_WT_param}${f_E_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
+      const finalUrl = `https://www.linkedin.com/jobs/search/?f_TPR=${time}${geoId ? `&geoId=${geoId}` : ""}${distanceParam}${f_C_param}${f_EA_param}${f_JIYN_param}${f_WT_param}${f_E_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
       
       const a = document.createElement('a');
       a.href = finalUrl;
