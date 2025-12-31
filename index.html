@@ -310,6 +310,76 @@
       transform: translateX(20px);
     }
     
+    /* Distance Range Slider */
+    .slider-container {
+      margin-top: 10px;
+    }
+    
+    .slider-value {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .slider-value-label {
+      font-size: 0.95em;
+      font-weight: 500;
+      color: var(--linkedin-blue);
+    }
+    
+    .range-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: linear-gradient(to right, var(--linkedin-blue) 0%, var(--linkedin-blue) 0%, var(--border-color) 0%, var(--border-color) 100%);
+      outline: none;
+      transition: background 0.3s;
+    }
+    
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--linkedin-blue);
+      cursor: pointer;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: all 0.2s;
+    }
+    
+    .range-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 3px 8px var(--shadow);
+    }
+    
+    .range-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--linkedin-blue);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: all 0.2s;
+    }
+    
+    .range-slider::-moz-range-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 3px 8px var(--shadow);
+    }
+    
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 0.75em;
+      color: var(--text-secondary);
+    }
+    
     .button-container {
       display: flex;
       gap: 10px;
@@ -524,14 +594,18 @@
       
       <div class="section" id="distanceDiv">
         <label class="section-title" for="radius">Distance</label>
-        <select id="radius">
-          <option value="" disabled selected>Select Distance</option>
-          <option value="5">5 miles</option>
-          <option value="10">10 miles</option>
-          <option value="25">25 miles</option>
-          <option value="50">50 miles</option>
-          <option value="100">100 miles</option>
-        </select>
+        <div class="slider-container">
+          <div class="slider-value">
+            <span id="radiusValue" class="slider-value-label">25 miles</span>
+          </div>
+          <input type="range" id="radius" class="range-slider" min="5" max="100" value="25" step="5">
+          <div class="slider-labels">
+            <span>5 mi</span>
+            <span>25 mi</span>
+            <span>50 mi</span>
+            <span>100 mi</span>
+          </div>
+        </div>
       </div>
       
       <!-- Job Type Section -->
@@ -675,7 +749,25 @@
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', savedTheme);
       loadSavedSearches();
+      updateSlider(); // Initialize slider display
     });
+    
+    // Distance slider update
+    const radiusSlider = document.getElementById('radius');
+    const radiusValue = document.getElementById('radiusValue');
+    
+    function updateSlider() {
+      const value = radiusSlider.value;
+      radiusValue.textContent = value + ' miles';
+      
+      // Update gradient background
+      const min = radiusSlider.min;
+      const max = radiusSlider.max;
+      const percentage = ((value - min) / (max - min)) * 100;
+      radiusSlider.style.background = `linear-gradient(to right, var(--linkedin-blue) 0%, var(--linkedin-blue) ${percentage}%, var(--border-color) ${percentage}%, var(--border-color) 100%)`;
+    }
+    
+    radiusSlider.addEventListener('input', updateSlider);
     
     // Collapsible sections
     function toggleCollapse(header) {
@@ -729,7 +821,7 @@
       document.getElementById('keywords').value = '';
       document.getElementById('experience').value = '';
       document.getElementById('location').value = '';
-      document.getElementById('radius').value = '';
+      document.getElementById('radius').value = '25';
       document.getElementById('customGeoId').value = '';
       document.getElementById('time').value = '';
       document.getElementById('sort').value = 'DD';
@@ -740,6 +832,9 @@
       // Reset visibility
       document.getElementById('customGeoDiv').style.display = 'none';
       document.getElementById('distanceDiv').style.display = 'block';
+      
+      // Update slider display
+      updateSlider();
     }
     
     // Build URL function
@@ -879,7 +974,7 @@
       document.getElementById('experience').value = data.experience || '';
       document.getElementById('location').value = data.location || '';
       document.getElementById('customGeoId').value = data.customGeoId || '';
-      document.getElementById('radius').value = data.radius || '';
+      document.getElementById('radius').value = data.radius || '25';
       document.getElementById('time').value = data.time || '';
       document.getElementById('sort').value = data.sort || 'DD';
       
@@ -903,6 +998,9 @@
       if (data.location) {
         document.getElementById('location').dispatchEvent(new Event('change'));
       }
+      
+      // Update slider display
+      updateSlider();
     }
     
     function loadSavedSearches() {
