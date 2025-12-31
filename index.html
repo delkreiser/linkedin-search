@@ -640,6 +640,15 @@
                 </div>
               </label>
             </div>
+            <div class="toggle-cell">
+              <label class="toggle-label">
+                <span>Top Applicant</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleTopApplicant">
+                  <span class="slider"></span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -781,11 +790,14 @@
       const f_C_param = document.getElementById('toggleFAANG').checked 
         ? "&f_C=" + encodeURIComponent("1441,10667,1586,8074624,165158,162479") 
         : "";
+      const f_JC_param = document.getElementById('toggleTopApplicant').checked 
+        ? "&f_JC=(0%2Clisystem%2Ctop-applicant-jobs)" 
+        : "";
       
       const timeParam = time ? `f_TPR=${time}` : "";
       const geoParam = geoId ? `&geoId=${geoId}` : "";
       
-      const finalUrl = `https://www.linkedin.com/jobs/search/?${timeParam}${geoParam}${distanceParam}${f_C_param}${f_EA_param}${f_AL_param}${f_JIYN_param}${f_WT_param}${f_E_param}${f_JT_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
+      const finalUrl = `https://www.linkedin.com/jobs/search/?${timeParam}${geoParam}${distanceParam}${f_C_param}${f_EA_param}${f_AL_param}${f_JIYN_param}${f_JC_param}${f_WT_param}${f_E_param}${f_JT_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
       
       // Auto-save to recent searches
       if (!skipSave) {
@@ -857,6 +869,7 @@
         toggleUnder10: document.getElementById('toggleUnder10').checked,
         toggleNetwork: document.getElementById('toggleNetwork').checked,
         toggleFAANG: document.getElementById('toggleFAANG').checked,
+        toggleTopApplicant: document.getElementById('toggleTopApplicant').checked,
         jobTypes: Array.from(document.querySelectorAll('[id^="jobtype-"]:checked')).map(cb => cb.id)
       };
     }
@@ -874,6 +887,7 @@
       document.getElementById('toggleUnder10').checked = data.toggleUnder10 || false;
       document.getElementById('toggleNetwork').checked = data.toggleNetwork || false;
       document.getElementById('toggleFAANG').checked = data.toggleFAANG || false;
+      document.getElementById('toggleTopApplicant').checked = data.toggleTopApplicant || false;
       
       // Reset all job type checkboxes
       document.querySelectorAll('[id^="jobtype-"]').forEach(cb => cb.checked = false);
