@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn Job Search Tool</title>
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+  <style>
+    * { box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #e9ecef;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-placeholder: #aaa;
+      --border-color: #ccc;
+      --linkedin-blue: #0073b1;
+      --linkedin-blue-hover: #005582;
+      --shadow: rgba(0,0,0,0.1);
+      --toggle-off: #ccc;
+    }
+    
+    [data-theme="dark"] {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --text-placeholder: #666;
+      --border-color: #444;
+      --linkedin-blue: #0a66c2;
+      --linkedin-blue-hover: #004182;
+      --shadow: rgba(0,0,0,0.3);
+      --toggle-off: #555;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .header-controls {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .icon-button {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.9em;
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+    
+    .icon-button:hover {
+      background: var(--linkedin-blue);
+      color: white;
+      border-color: var(--linkedin-blue);
+    }
+    
+    .icon-button.profile-btn {
+      background: var(--linkedin-blue);
+      color: white;
+      border-color: var(--linkedin-blue);
+    }
+    
+    .icon-button.profile-btn:hover {
+      background: var(--linkedin-blue-hover);
+    }
+    
+    /* Profile Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.2s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal-content {
+      background-color: var(--bg-secondary);
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 8px 24px var(--shadow);
+      animation: slideIn 0.3s;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.3em;
+      color: var(--text-primary);
+    }
+    
+    .close {
+      color: var(--text-secondary);
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    
+    .close:hover {
+      color: var(--text-primary);
+    }
+    
+    .modal-body {
+      padding: 25px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    
+    .profile-list {
+      margin-bottom: 20px;
+    }
+    
+    .profile-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin: 10px 0;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .profile-item:hover {
+      border-color: var(--linkedin-blue);
+      transform: translateX(5px);
+    }
+    
+    .profile-item.active {
+      border-color: var(--linkedin-blue);
+      background: rgba(0, 115, 177, 0.05);
+    }
+    
+    .profile-info {
+      flex: 1;
+    }
+    
+    .profile-name {
+      font-weight: 600;
+      font-size: 1em;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+    
+    .profile-details {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+    
+    .profile-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .profile-action-btn {
+      background: transparent;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.9em;
+      transition: background-color 0.2s;
+    }
+    
+    .profile-action-btn.load {
+      color: var(--linkedin-blue);
+    }
+    
+    .profile-action-btn.load:hover {
+      background: rgba(0, 115, 177, 0.1);
+    }
+    
+    .profile-action-btn.delete {
+      color: #dc3545;
+    }
+    
+    .profile-action-btn.delete:hover {
+      background: rgba(220, 53, 69, 0.1);
+    }
+    
+    .new-profile-form {
+      background: var(--bg-primary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .new-profile-form input {
+      margin-top: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .modal-footer {
+      padding: 15px 25px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95em;
+      transition: all 0.2s;
+    }
+    
+    .modal-btn-primary {
+      background: var(--linkedin-blue);
+      color: white;
+    }
+    
+    .modal-btn-primary:hover {
+      background: var(--linkedin-blue-hover);
+    }
+    
+    .modal-btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .modal-btn-secondary:hover {
+      background: var(--bg-primary);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+    
+    .container {
+      background-color: var(--bg-secondary);
+      padding: 0;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px var(--shadow);
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      transition: background-color 0.3s;
+    }
+    
+    .header-img {
+      width: 100%;
+      display: block;
+      max-height: 200px;
+      object-fit: cover;
+    }
+    
+    .content {
+      padding: 25px;
+    }
+    
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .preset-btn {
+      padding: 10px;
+      font-size: 0.85em;
+      cursor: pointer;
+      border: 2px solid var(--linkedin-blue);
+      background-color: transparent;
+      color: var(--linkedin-blue);
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    
+    .preset-btn:hover {
+      background-color: var(--linkedin-blue);
+      color: white;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95em;
+      margin-bottom: 5px;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+    }
+    
+    .collapsible-section {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+    
+    .collapsible-header {
+      background: var(--bg-primary);
+      padding: 12px 15px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+    
+    .collapsible-header:hover {
+      opacity: 0.9;
+    }
+    
+    .collapsible-header .arrow {
+      transition: transform 0.3s;
+    }
+    
+    .collapsible-header.active .arrow {
+      transform: rotate(180deg);
+    }
+    
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 15px;
+    }
+    
+    .collapsible-content.active {
+      max-height: 800px;
+      padding: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 0.9em;
+      color: var(--text-secondary);
+    }
+    
+    input, select {
+      margin-top: 5px;
+      padding: 10px 12px;
+      font-size: 1em;
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--linkedin-blue);
+      box-shadow: 0 0 0 3px rgba(0, 115, 177, 0.1);
+    }
+    
+    ::placeholder { 
+      color: var(--text-placeholder);
+    }
+    
+    option[disabled] { 
+      color: var(--text-placeholder);
+    }
+    
+    #customGeoDiv { 
+      margin-top: 10px;
+      display: none;
+    }
+    
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+    }
+    
+    .checkbox-item:hover {
+      background-color: var(--bg-primary);
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+    
+    .checkbox-item label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 0.85em;
+    }
+    
+    .toggle-table {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    
+    .toggle-cell {
+      display: flex;
+      align-items: center;
+    }
+    
+    .toggle-label {
+      font-size: 0.85em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 8px;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--toggle-off);
+      transition: .3s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: var(--linkedin-blue);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    
+    /* Distance Range Slider */
+    .slider-container {
+      margin-top: 10px;
+      padding: 10px 0;
+    }
+    
+    .slider-value {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .slider-value-label {
+      font-size: 0.95em;
+      font-weight: 500;
+      color: var(--linkedin-blue);
+    }
+    
+    .range-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      border-radius: 1px;
+      background: linear-gradient(to right, var(--linkedin-blue) 0%, var(--linkedin-blue) 0%, var(--border-color) 0%, var(--border-color) 100%);
+      outline: none;
+      transition: background 0.3s;
+      margin: 15px 0;
+    }
+    
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: white;
+      border: 5px solid var(--linkedin-blue);
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: all 0.2s;
+      margin-top: 0;
+    }
+    
+    .range-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 3px 12px var(--shadow);
+    }
+    
+    .range-slider::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: white;
+      border: 5px solid var(--linkedin-blue);
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: all 0.2s;
+    }
+    
+    .range-slider::-moz-range-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 3px 12px var(--shadow);
+    }
+    
+    .range-slider::-moz-range-track {
+      height: 2px;
+      background: transparent;
+    }
+    
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 0.75em;
+      color: var(--text-secondary);
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+    
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .primary-btn {
+      background-color: var(--linkedin-blue);
+      color: #fff;
+    }
+    
+    .primary-btn:hover {
+      background-color: var(--linkedin-blue-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+    
+    .secondary-btn {
+      background-color: transparent;
+      color: var(--linkedin-blue);
+      border: 2px solid var(--linkedin-blue);
+    }
+    
+    .secondary-btn:hover {
+      background-color: var(--linkedin-blue);
+      color: white;
+    }
+    
+    .saved-searches {
+      background: var(--bg-primary);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .saved-search-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 5px 0;
+      background: var(--bg-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .saved-search-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+    
+    .saved-search-name {
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+    
+    .saved-search-details {
+      font-size: 0.75em;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+    
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: #dc3545;
+      cursor: pointer;
+      padding: 5px 10px;
+      font-size: 0.9em;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    
+    .delete-btn:hover {
+      background: rgba(220, 53, 69, 0.1);
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 5px;
+      color: var(--text-secondary);
+      cursor: help;
+      font-size: 0.8em;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.85em;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    @media (max-width: 600px) {
+      .content { padding: 20px; }
+      .preset-buttons { grid-template-columns: 1fr; }
+      .checkbox-group { grid-template-columns: 1fr; }
+      .toggle-table { grid-template-columns: 1fr; }
+      .button-container { flex-direction: column; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <div class="header-controls">
+    <button class="icon-button profile-btn" onclick="openProfileModal()">👤 Profiles</button>
+    <button class="icon-button" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="icon-button" onclick="clearForm()">🔄 Clear</button>
+  </div>
+  
+  <div class="container">
+    <img class="header-img" src="img/totoro.webp" alt="Header Image" onerror="this.style.display='none'">
+    
+    <div class="content">
+      <!-- Preset Quick Searches -->
+      <div class="preset-buttons">
+        <button class="preset-btn" onclick="applyPreset('remote-entry')">🏠 Remote Entry</button>
+        <button class="preset-btn" onclick="applyPreset('faang-senior')">⭐ FAANG Senior</button>
+        <button class="preset-btn" onclick="applyPreset('easy-apply')">⚡ Easy Apply</button>
+        <button class="preset-btn" onclick="applyPreset('recent-few')">🔥 Recent & Few</button>
+      </div>
+      
+      <!-- Saved Searches -->
+      <div id="savedSearchesContainer" style="display: none;">
+        <div class="saved-searches">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong style="font-size: 0.9em;">Recent Searches</strong>
+            <button class="delete-btn" onclick="clearAllSaves()" style="font-size: 0.8em;">Clear All</button>
+          </div>
+          <div id="savedSearchesList"></div>
+        </div>
+      </div>
+      
+      <!-- Keywords Section -->
+      <div class="section">
+        <label class="section-title" for="keywords">
+          Keywords
+          <span class="tooltip">ⓘ
+            <span class="tooltiptext">Enter job title, skills, or company name</span>
+          </span>
+        </label>
+        <input type="text" id="keywords" placeholder="e.g., project manager, python developer">
+      </div>
+      
+      <!-- Core Filters (Always Visible) -->
+      <div class="section">
+        <label class="section-title" for="experience">Experience Level</label>
+        <select id="experience">
+          <option value="" disabled selected>Select Experience Level</option>
+          <option value="1">Internship</option>
+          <option value="2">Entry Level</option>
+          <option value="3">Associate</option>
+          <option value="4">Mid-Senior Level</option>
+          <option value="5">Director</option>
+          <option value="6">Executive</option>
+        </select>
+      </div>
+      
+      <div class="section">
+        <label class="section-title" for="location">Location</label>
+        <select id="location">
+          <option value="" disabled selected>Select Location</option>
+          <option value="Remote">🌍 Remote</option>
+          <option value="103644278">United States</option>
+          <option value="102277331">San Francisco Bay Area</option>
+          <option value="105080838">New York, NY</option>
+          <option value="104472865">Austin, TX</option>
+          <option value="104116203">Seattle, WA</option>
+          <option value="103736294">Denver, CO</option>
+          <option value="102597912">Boulder, CO</option>
+          <option value="105763813">Colorado</option>
+          <option value="106233382">San Jose, CA</option>
+          <option value="105865430">Lexington Park, MD</option>
+          <option value="104383890">Washington DC</option>
+          <option value="103755962">Bloomington, IL</option>
+          <option value="105142920">Huntsville, AL</option>
+          <option value="101915197">Durham, NC</option>
+          <option value="Other">📍 Other (Enter geoId)</option>
+        </select>
+        
+        <div id="customGeoDiv">
+          <label for="customGeoId">LinkedIn geoId:</label>
+          <input type="text" id="customGeoId" placeholder="Enter LinkedIn geoId">
+        </div>
+      </div>
+      
+      <div class="section" id="distanceDiv">
+        <label class="section-title" for="radius">Distance</label>
+        <div class="slider-container">
+          <div class="slider-value">
+            <span id="radiusValue" class="slider-value-label">25 miles</span>
+          </div>
+          <input type="range" id="radius" class="range-slider" min="5" max="100" value="25" step="5">
+          <div class="slider-labels">
+            <span>5 mi</span>
+            <span>25 mi</span>
+            <span>50 mi</span>
+            <span>100 mi</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Job Type Section -->
+      <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapse(this)">
+          <span class="section-title">Job Type</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="collapsible-content">
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="jobtype-fulltime" value="F">
+              <label for="jobtype-fulltime">Full-time</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="jobtype-parttime" value="P">
+              <label for="jobtype-parttime">Part-time</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="jobtype-contract" value="C">
+              <label for="jobtype-contract">Contract</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="jobtype-temporary" value="T">
+              <label for="jobtype-temporary">Temporary</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="jobtype-internship" value="I">
+              <label for="jobtype-internship">Internship</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="jobtype-volunteer" value="V">
+              <label for="jobtype-volunteer">Volunteer</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Time & Sort Section -->
+      <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapse(this)">
+          <span class="section-title">Time & Sort Options</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="collapsible-content">
+          <label class="section-title" for="time">Filter by Time</label>
+          <select id="time">
+            <option value="">Any Time</option>
+            <option value="r1800">Past 30 Minutes</option>
+            <option value="r3600">Past Hour</option>
+            <option value="r7200">Past 2 Hours</option>
+            <option value="r86400">Past 24 Hours</option>
+            <option value="r604800">Past Week</option>
+            <option value="r2592000">Past Month</option>
+          </select>
+          
+          <label class="section-title" for="sort" style="margin-top: 15px;">Sort By</label>
+          <select id="sort">
+            <option value="DD">Most Recent</option>
+            <option value="R">Most Relevant</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Advanced Filters Section -->
+      <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapse(this)">
+          <span class="section-title">Advanced Filters</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="collapsible-content">
+          <div class="toggle-table">
+            <div class="toggle-cell">
+              <label class="toggle-label">
+                <span>Easy Apply</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleEasyApply">
+                  <span class="slider"></span>
+                </div>
+              </label>
+            </div>
+            <div class="toggle-cell">
+              <label class="toggle-label">
+                <span>Under 10 Applicants</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleUnder10">
+                  <span class="slider"></span>
+                </div>
+              </label>
+            </div>
+            <div class="toggle-cell">
+              <label class="toggle-label">
+                <span>In Your Network</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleNetwork">
+                  <span class="slider"></span>
+                </div>
+              </label>
+            </div>
+            <div class="toggle-cell">
+              <label class="toggle-label">
+                <span>FAANG Companies</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleFAANG">
+                  <span class="slider"></span>
+                </div>
+              </label>
+            </div>
+            <div class="toggle-cell">
+              <label class="toggle-label">
+                <span>Top Applicant</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="toggleTopApplicant">
+                  <span class="slider"></span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="button-container">
+        <button class="primary-btn" onclick="buildUrl()">🔍 Search Jobs</button>
+        <button class="secondary-btn" onclick="saveSearch()">💾 Save Search</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Manage Profiles</h2>
+        <span class="close" onclick="closeProfileModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="profileList" class="profile-list"></div>
+        
+        <div class="new-profile-form">
+          <label class="section-title">Create New Profile</label>
+          <input type="text" id="newProfileName" placeholder="Profile name (e.g., 'Senior Remote Jobs')">
+          <button class="modal-btn modal-btn-primary" onclick="saveCurrentAsProfile()">💾 Save Current Settings</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-secondary" onclick="closeProfileModal()">Close</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Theme Toggle
+    function toggleTheme() {
+      const body = document.body;
+      const currentTheme = body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+    
+    // Load saved theme
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.body.setAttribute('data-theme', savedTheme);
+      loadSavedSearches();
+      updateSlider(); // Initialize slider display
+    });
+    
+    // Distance slider update
+    const radiusSlider = document.getElementById('radius');
+    const radiusValue = document.getElementById('radiusValue');
+    
+    function updateSlider() {
+      const value = radiusSlider.value;
+      radiusValue.textContent = value + ' miles';
+      
+      // Update gradient background
+      const min = radiusSlider.min;
+      const max = radiusSlider.max;
+      const percentage = ((value - min) / (max - min)) * 100;
+      radiusSlider.style.background = `linear-gradient(to right, var(--linkedin-blue) 0%, var(--linkedin-blue) ${percentage}%, var(--border-color) ${percentage}%, var(--border-color) 100%)`;
+    }
+    
+    radiusSlider.addEventListener('input', updateSlider);
+    
+    // Collapsible sections
+    function toggleCollapse(header) {
+      header.classList.toggle('active');
+      const content = header.nextElementSibling;
+      content.classList.toggle('active');
+    }
+    
+    // Location change handler
+    document.getElementById('location').addEventListener('change', function () {
+      const isOther = this.value === 'Other';
+      const isRemote = this.value === 'Remote';
+      document.getElementById('customGeoDiv').style.display = isOther ? 'block' : 'none';
+      document.getElementById('distanceDiv').style.display = isRemote ? 'none' : 'block';
+    });
+    
+    // Preset configurations
+    function applyPreset(preset) {
+      clearForm();
+      
+      switch(preset) {
+        case 'remote-entry':
+          document.getElementById('location').value = 'Remote';
+          document.getElementById('experience').value = '2';
+          document.getElementById('time').value = 'r604800';
+          document.getElementById('distanceDiv').style.display = 'none';
+          break;
+          
+        case 'faang-senior':
+          document.getElementById('toggleFAANG').checked = true;
+          document.getElementById('experience').value = '4';
+          document.getElementById('time').value = 'r604800';
+          break;
+          
+        case 'easy-apply':
+          document.getElementById('toggleEasyApply').checked = true;
+          document.getElementById('time').value = 'r86400';
+          document.getElementById('sort').value = 'DD';
+          break;
+          
+        case 'recent-few':
+          document.getElementById('toggleUnder10').checked = true;
+          document.getElementById('time').value = 'r86400';
+          document.getElementById('sort').value = 'DD';
+          break;
+      }
+    }
+    
+    // Clear form
+    function clearForm() {
+      document.getElementById('keywords').value = '';
+      document.getElementById('experience').value = '';
+      document.getElementById('location').value = '';
+      document.getElementById('radius').value = '25';
+      document.getElementById('customGeoId').value = '';
+      document.getElementById('time').value = '';
+      document.getElementById('sort').value = 'DD';
+      
+      // Clear checkboxes
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      
+      // Reset visibility
+      document.getElementById('customGeoDiv').style.display = 'none';
+      document.getElementById('distanceDiv').style.display = 'block';
+      
+      // Update slider display
+      updateSlider();
+    }
+    
+    // Build URL function
+    function buildUrl(skipSave = false) {
+      const keywords = encodeURIComponent(document.getElementById('keywords').value.trim());
+      
+      // Experience Level
+      const expValue = document.getElementById('experience').value;
+      let f_E_param = expValue ? `&f_E=${encodeURIComponent(expValue)}` : "";
+      
+      // Job Type
+      const jobTypes = [];
+      document.querySelectorAll('[id^="jobtype-"]').forEach(cb => {
+        if (cb.checked) jobTypes.push(cb.value);
+      });
+      const f_JT_param = jobTypes.length > 0 ? `&f_JT=${jobTypes.join('%2C')}` : "";
+      
+      // Location
+      const locationSelect = document.getElementById('location');
+      const locationValue = locationSelect.value;
+      const locationText = locationSelect.options[locationSelect.selectedIndex]?.text.replace(/^[🌍📍]\s*/, '');
+      let geoId = locationValue;
+      let f_WT_param = "";
+      
+      if (locationValue === "Remote") {
+        geoId = "";
+        f_WT_param = "&f_WT=2";
+      } else if (locationValue === "Other") {
+        geoId = document.getElementById('customGeoId').value.trim();
+        f_WT_param = "&f_WT=1%2C3";
+      } else if (locationValue !== "") {
+        f_WT_param = "&f_WT=1%2C3";
+      }
+      
+      const radiusValue = document.getElementById('radius').value;
+      const distanceParam = radiusValue ? `&distance=${radiusValue}` : '';
+      const locationParam = (locationValue && locationValue !== "Remote" && locationValue !== "Other") 
+        ? `&location=${encodeURIComponent(locationText)}` 
+        : '';
+      
+      const time = document.getElementById('time').value;
+      const sort = document.getElementById('sort').value;
+      
+      // Advanced Toggles
+      const f_AL_param = document.getElementById('toggleEasyApply').checked ? "&f_AL=true" : "";
+      const f_EA_param = document.getElementById('toggleUnder10').checked ? "&f_EA=true" : "";
+      const f_JIYN_param = document.getElementById('toggleNetwork').checked ? "&f_JIYN=true" : "";
+      const f_C_param = document.getElementById('toggleFAANG').checked 
+        ? "&f_C=" + encodeURIComponent("1441,10667,1586,8074624,165158,162479") 
+        : "";
+      const f_JC_param = document.getElementById('toggleTopApplicant').checked 
+        ? "&f_JC=(0%2Clisystem%2Ctop-applicant-jobs)" 
+        : "";
+      
+      const timeParam = time ? `f_TPR=${time}` : "";
+      const geoParam = geoId ? `&geoId=${geoId}` : "";
+      
+      const finalUrl = `https://www.linkedin.com/jobs/search/?${timeParam}${geoParam}${distanceParam}${f_C_param}${f_EA_param}${f_AL_param}${f_JIYN_param}${f_JC_param}${f_WT_param}${f_E_param}${f_JT_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
+      
+      // Auto-save to recent searches
+      if (!skipSave) {
+        addToRecentSearches();
+      }
+      
+      // Open in new tab
+      const a = document.createElement('a');
+      a.href = finalUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    
+    // Save Search functionality
+    function saveSearch() {
+      const keywords = document.getElementById('keywords').value.trim();
+      if (!keywords) {
+        alert('Please enter keywords before saving');
+        return;
+      }
+      
+      addToRecentSearches();
+      alert('Search saved!');
+    }
+    
+    function addToRecentSearches() {
+      const keywords = document.getElementById('keywords').value.trim();
+      if (!keywords) return;
+      
+      const location = document.getElementById('location').selectedOptions[0]?.text.replace(/^[🌍📍]\s*/, '') || 'Any';
+      const experience = document.getElementById('experience').selectedOptions[0]?.text || 'Any';
+      
+      const search = {
+        keywords,
+        location,
+        experience,
+        timestamp: Date.now(),
+        formData: getFormData()
+      };
+      
+      let searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      
+      // Remove duplicates based on keywords and location
+      searches = searches.filter(s => !(s.keywords === keywords && s.location === location));
+      
+      // Add to beginning
+      searches.unshift(search);
+      
+      // Keep only last 5
+      searches = searches.slice(0, 5);
+      
+      localStorage.setItem('recentSearches', JSON.stringify(searches));
+      loadSavedSearches();
+    }
+    
+    function getFormData() {
+      return {
+        keywords: document.getElementById('keywords').value,
+        experience: document.getElementById('experience').value,
+        location: document.getElementById('location').value,
+        customGeoId: document.getElementById('customGeoId').value,
+        radius: document.getElementById('radius').value,
+        time: document.getElementById('time').value,
+        sort: document.getElementById('sort').value,
+        toggleEasyApply: document.getElementById('toggleEasyApply').checked,
+        toggleUnder10: document.getElementById('toggleUnder10').checked,
+        toggleNetwork: document.getElementById('toggleNetwork').checked,
+        toggleFAANG: document.getElementById('toggleFAANG').checked,
+        toggleTopApplicant: document.getElementById('toggleTopApplicant').checked,
+        jobTypes: Array.from(document.querySelectorAll('[id^="jobtype-"]:checked')).map(cb => cb.id)
+      };
+    }
+    
+    function setFormData(data) {
+      document.getElementById('keywords').value = data.keywords || '';
+      document.getElementById('experience').value = data.experience || '';
+      document.getElementById('location').value = data.location || '';
+      document.getElementById('customGeoId').value = data.customGeoId || '';
+      document.getElementById('radius').value = data.radius || '25';
+      document.getElementById('time').value = data.time || '';
+      document.getElementById('sort').value = data.sort || 'DD';
+      
+      document.getElementById('toggleEasyApply').checked = data.toggleEasyApply || false;
+      document.getElementById('toggleUnder10').checked = data.toggleUnder10 || false;
+      document.getElementById('toggleNetwork').checked = data.toggleNetwork || false;
+      document.getElementById('toggleFAANG').checked = data.toggleFAANG || false;
+      document.getElementById('toggleTopApplicant').checked = data.toggleTopApplicant || false;
+      
+      // Reset all job type checkboxes
+      document.querySelectorAll('[id^="jobtype-"]').forEach(cb => cb.checked = false);
+      // Set saved job types
+      if (data.jobTypes) {
+        data.jobTypes.forEach(id => {
+          const checkbox = document.getElementById(id);
+          if (checkbox) checkbox.checked = true;
+        });
+      }
+      
+      // Trigger location change
+      if (data.location) {
+        document.getElementById('location').dispatchEvent(new Event('change'));
+      }
+      
+      // Update slider display
+      updateSlider();
+    }
+    
+    function loadSavedSearches() {
+      const searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      const container = document.getElementById('savedSearchesContainer');
+      const list = document.getElementById('savedSearchesList');
+      
+      if (searches.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      container.style.display = 'block';
+      list.innerHTML = searches.map((search, index) => `
+        <div class="saved-search-item" onclick="loadSearch(${index})">
+          <div>
+            <div class="saved-search-name">${search.keywords}</div>
+            <div class="saved-search-details">${search.location} • ${search.experience}</div>
+          </div>
+          <button class="delete-btn" onclick="event.stopPropagation(); deleteSearch(${index})">×</button>
+        </div>
+      `).join('');
+    }
+    
+    function loadSearch(index) {
+      const searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      if (searches[index]) {
+        setFormData(searches[index].formData);
+      }
+    }
+    
+    function deleteSearch(index) {
+      let searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      searches.splice(index, 1);
+      localStorage.setItem('recentSearches', JSON.stringify(searches));
+      loadSavedSearches();
+    }
+    
+    function clearAllSaves() {
+      if (confirm('Clear all saved searches?')) {
+        localStorage.removeItem('recentSearches');
+        loadSavedSearches();
+      }
+    }
+    
+    // ============================================
+    // PROFILE MANAGEMENT
+    // ============================================
+    
+    let currentProfile = null;
+    
+    function openProfileModal() {
+      document.getElementById('profileModal').style.display = 'block';
+      loadProfiles();
+    }
+    
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+      document.getElementById('newProfileName').value = '';
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('profileModal');
+      if (event.target == modal) {
+        closeProfileModal();
+      }
+    }
+    
+    function getProfileData() {
+      return {
+        experience: document.getElementById('experience').value,
+        location: document.getElementById('location').value,
+        customGeoId: document.getElementById('customGeoId').value,
+        radius: document.getElementById('radius').value,
+        time: document.getElementById('time').value,
+        sort: document.getElementById('sort').value,
+        toggleEasyApply: document.getElementById('toggleEasyApply').checked,
+        toggleUnder10: document.getElementById('toggleUnder10').checked,
+        toggleNetwork: document.getElementById('toggleNetwork').checked,
+        toggleFAANG: document.getElementById('toggleFAANG').checked,
+        toggleTopApplicant: document.getElementById('toggleTopApplicant').checked,
+        jobTypes: Array.from(document.querySelectorAll('[id^="jobtype-"]:checked')).map(cb => cb.id)
+      };
+    }
+    
+    function setProfileData(data) {
+      document.getElementById('experience').value = data.experience || '';
+      document.getElementById('location').value = data.location || '';
+      document.getElementById('customGeoId').value = data.customGeoId || '';
+      document.getElementById('radius').value = data.radius || '25';
+      document.getElementById('time').value = data.time || '';
+      document.getElementById('sort').value = data.sort || 'DD';
+      
+      document.getElementById('toggleEasyApply').checked = data.toggleEasyApply || false;
+      document.getElementById('toggleUnder10').checked = data.toggleUnder10 || false;
+      document.getElementById('toggleNetwork').checked = data.toggleNetwork || false;
+      document.getElementById('toggleFAANG').checked = data.toggleFAANG || false;
+      document.getElementById('toggleTopApplicant').checked = data.toggleTopApplicant || false;
+      
+      // Reset all job type checkboxes
+      document.querySelectorAll('[id^="jobtype-"]').forEach(cb => cb.checked = false);
+      // Set saved job types
+      if (data.jobTypes) {
+        data.jobTypes.forEach(id => {
+          const checkbox = document.getElementById(id);
+          if (checkbox) checkbox.checked = true;
+        });
+      }
+      
+      // Trigger location change
+      if (data.location) {
+        document.getElementById('location').dispatchEvent(new Event('change'));
+      }
+      
+      // Update slider display
+      updateSlider();
+    }
+    
+    function saveCurrentAsProfile() {
+      const profileName = document.getElementById('newProfileName').value.trim();
+      
+      if (!profileName) {
+        alert('Please enter a profile name');
+        return;
+      }
+      
+      const profileData = getProfileData();
+      const profile = {
+        name: profileName,
+        data: profileData,
+        created: Date.now()
+      };
+      
+      let profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      
+      // Check for duplicate names
+      const existingIndex = profiles.findIndex(p => p.name === profileName);
+      if (existingIndex !== -1) {
+        if (!confirm(`A profile named "${profileName}" already exists. Overwrite it?`)) {
+          return;
+        }
+        profiles[existingIndex] = profile;
+      } else {
+        profiles.push(profile);
+      }
+      
+      localStorage.setItem('jobProfiles', JSON.stringify(profiles));
+      currentProfile = profileName;
+      
+      document.getElementById('newProfileName').value = '';
+      loadProfiles();
+      
+      // Show success feedback
+      alert(`Profile "${profileName}" saved successfully!`);
+    }
+    
+    function loadProfiles() {
+      const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      const profileList = document.getElementById('profileList');
+      
+      if (profiles.length === 0) {
+        profileList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No profiles saved yet</p>
+            <p style="font-size: 0.9em;">Create a profile to save your search preferences</p>
+          </div>
+        `;
+        return;
+      }
+      
+      profileList.innerHTML = profiles.map((profile, index) => {
+        const isActive = currentProfile === profile.name;
+        const exp = profile.data.experience ? 
+          document.querySelector(`#experience option[value="${profile.data.experience}"]`)?.text || 'Any' : 'Any';
+        const loc = profile.data.location ? 
+          document.querySelector(`#location option[value="${profile.data.location}"]`)?.text.replace(/^[🌍📍]\s*/, '') || 'Any' : 'Any';
+        
+        return `
+          <div class="profile-item ${isActive ? 'active' : ''}" onclick="loadProfile(${index})">
+            <div class="profile-info">
+              <div class="profile-name">${profile.name}</div>
+              <div class="profile-details">${loc} • ${exp}</div>
+            </div>
+            <div class="profile-actions">
+              <button class="profile-action-btn load" onclick="event.stopPropagation(); loadProfile(${index}); closeProfileModal();">
+                📥 Load
+              </button>
+              <button class="profile-action-btn delete" onclick="event.stopPropagation(); deleteProfile(${index})">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function loadProfile(index) {
+      const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      if (profiles[index]) {
+        setProfileData(profiles[index].data);
+        currentProfile = profiles[index].name;
+        loadProfiles(); // Refresh to show active state
+      }
+    }
+    
+    function deleteProfile(index) {
+      const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      const profileName = profiles[index].name;
+      
+      if (confirm(`Delete profile "${profileName}"?`)) {
+        if (currentProfile === profileName) {
+          currentProfile = null;
+        }
+        profiles.splice(index, 1);
+        localStorage.setItem('jobProfiles', JSON.stringify(profiles));
+        loadProfiles();
+      }
+    }
+  </script>
+</body>
+</html>
