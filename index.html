@@ -54,6 +54,7 @@
       justify-content: flex-end;
       gap: 10px;
       margin-bottom: 15px;
+      flex-wrap: wrap;
     }
     
     .icon-button {
@@ -71,6 +72,222 @@
       background: var(--linkedin-blue);
       color: white;
       border-color: var(--linkedin-blue);
+    }
+    
+    .icon-button.profile-btn {
+      background: var(--linkedin-blue);
+      color: white;
+      border-color: var(--linkedin-blue);
+    }
+    
+    .icon-button.profile-btn:hover {
+      background: var(--linkedin-blue-hover);
+    }
+    
+    /* Profile Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.2s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal-content {
+      background-color: var(--bg-secondary);
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 8px 24px var(--shadow);
+      animation: slideIn 0.3s;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.3em;
+      color: var(--text-primary);
+    }
+    
+    .close {
+      color: var(--text-secondary);
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    
+    .close:hover {
+      color: var(--text-primary);
+    }
+    
+    .modal-body {
+      padding: 25px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    
+    .profile-list {
+      margin-bottom: 20px;
+    }
+    
+    .profile-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin: 10px 0;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .profile-item:hover {
+      border-color: var(--linkedin-blue);
+      transform: translateX(5px);
+    }
+    
+    .profile-item.active {
+      border-color: var(--linkedin-blue);
+      background: rgba(0, 115, 177, 0.05);
+    }
+    
+    .profile-info {
+      flex: 1;
+    }
+    
+    .profile-name {
+      font-weight: 600;
+      font-size: 1em;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+    
+    .profile-details {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+    }
+    
+    .profile-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .profile-action-btn {
+      background: transparent;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.9em;
+      transition: background-color 0.2s;
+    }
+    
+    .profile-action-btn.load {
+      color: var(--linkedin-blue);
+    }
+    
+    .profile-action-btn.load:hover {
+      background: rgba(0, 115, 177, 0.1);
+    }
+    
+    .profile-action-btn.delete {
+      color: #dc3545;
+    }
+    
+    .profile-action-btn.delete:hover {
+      background: rgba(220, 53, 69, 0.1);
+    }
+    
+    .new-profile-form {
+      background: var(--bg-primary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .new-profile-form input {
+      margin-top: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .modal-footer {
+      padding: 15px 25px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95em;
+      transition: all 0.2s;
+    }
+    
+    .modal-btn-primary {
+      background: var(--linkedin-blue);
+      color: white;
+    }
+    
+    .modal-btn-primary:hover {
+      background: var(--linkedin-blue-hover);
+    }
+    
+    .modal-btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .modal-btn-secondary:hover {
+      background: var(--bg-primary);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
     }
     
     .container {
@@ -521,6 +738,7 @@
 </head>
 <body data-theme="light">
   <div class="header-controls">
+    <button class="icon-button profile-btn" onclick="openProfileModal()">👤 Profiles</button>
     <button class="icon-button" onclick="toggleTheme()">🌓 Theme</button>
     <button class="icon-button" onclick="clearForm()">🔄 Clear</button>
   </div>
@@ -739,6 +957,28 @@
       <div class="button-container">
         <button class="primary-btn" onclick="buildUrl()">🔍 Search Jobs</button>
         <button class="secondary-btn" onclick="saveSearch()">💾 Save Search</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Manage Profiles</h2>
+        <span class="close" onclick="closeProfileModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="profileList" class="profile-list"></div>
+        
+        <div class="new-profile-form">
+          <label class="section-title">Create New Profile</label>
+          <input type="text" id="newProfileName" placeholder="Profile name (e.g., 'Senior Remote Jobs')">
+          <button class="modal-btn modal-btn-primary" onclick="saveCurrentAsProfile()">💾 Save Current Settings</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-secondary" onclick="closeProfileModal()">Close</button>
       </div>
     </div>
   </div>
@@ -1052,6 +1292,182 @@
       if (confirm('Clear all saved searches?')) {
         localStorage.removeItem('recentSearches');
         loadSavedSearches();
+      }
+    }
+    
+    // ============================================
+    // PROFILE MANAGEMENT
+    // ============================================
+    
+    let currentProfile = null;
+    
+    function openProfileModal() {
+      document.getElementById('profileModal').style.display = 'block';
+      loadProfiles();
+    }
+    
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+      document.getElementById('newProfileName').value = '';
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('profileModal');
+      if (event.target == modal) {
+        closeProfileModal();
+      }
+    }
+    
+    function getProfileData() {
+      return {
+        experience: document.getElementById('experience').value,
+        location: document.getElementById('location').value,
+        customGeoId: document.getElementById('customGeoId').value,
+        radius: document.getElementById('radius').value,
+        time: document.getElementById('time').value,
+        sort: document.getElementById('sort').value,
+        toggleEasyApply: document.getElementById('toggleEasyApply').checked,
+        toggleUnder10: document.getElementById('toggleUnder10').checked,
+        toggleNetwork: document.getElementById('toggleNetwork').checked,
+        toggleFAANG: document.getElementById('toggleFAANG').checked,
+        toggleTopApplicant: document.getElementById('toggleTopApplicant').checked,
+        jobTypes: Array.from(document.querySelectorAll('[id^="jobtype-"]:checked')).map(cb => cb.id)
+      };
+    }
+    
+    function setProfileData(data) {
+      document.getElementById('experience').value = data.experience || '';
+      document.getElementById('location').value = data.location || '';
+      document.getElementById('customGeoId').value = data.customGeoId || '';
+      document.getElementById('radius').value = data.radius || '25';
+      document.getElementById('time').value = data.time || '';
+      document.getElementById('sort').value = data.sort || 'DD';
+      
+      document.getElementById('toggleEasyApply').checked = data.toggleEasyApply || false;
+      document.getElementById('toggleUnder10').checked = data.toggleUnder10 || false;
+      document.getElementById('toggleNetwork').checked = data.toggleNetwork || false;
+      document.getElementById('toggleFAANG').checked = data.toggleFAANG || false;
+      document.getElementById('toggleTopApplicant').checked = data.toggleTopApplicant || false;
+      
+      // Reset all job type checkboxes
+      document.querySelectorAll('[id^="jobtype-"]').forEach(cb => cb.checked = false);
+      // Set saved job types
+      if (data.jobTypes) {
+        data.jobTypes.forEach(id => {
+          const checkbox = document.getElementById(id);
+          if (checkbox) checkbox.checked = true;
+        });
+      }
+      
+      // Trigger location change
+      if (data.location) {
+        document.getElementById('location').dispatchEvent(new Event('change'));
+      }
+      
+      // Update slider display
+      updateSlider();
+    }
+    
+    function saveCurrentAsProfile() {
+      const profileName = document.getElementById('newProfileName').value.trim();
+      
+      if (!profileName) {
+        alert('Please enter a profile name');
+        return;
+      }
+      
+      const profileData = getProfileData();
+      const profile = {
+        name: profileName,
+        data: profileData,
+        created: Date.now()
+      };
+      
+      let profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      
+      // Check for duplicate names
+      const existingIndex = profiles.findIndex(p => p.name === profileName);
+      if (existingIndex !== -1) {
+        if (!confirm(`A profile named "${profileName}" already exists. Overwrite it?`)) {
+          return;
+        }
+        profiles[existingIndex] = profile;
+      } else {
+        profiles.push(profile);
+      }
+      
+      localStorage.setItem('jobProfiles', JSON.stringify(profiles));
+      currentProfile = profileName;
+      
+      document.getElementById('newProfileName').value = '';
+      loadProfiles();
+      
+      // Show success feedback
+      alert(`Profile "${profileName}" saved successfully!`);
+    }
+    
+    function loadProfiles() {
+      const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      const profileList = document.getElementById('profileList');
+      
+      if (profiles.length === 0) {
+        profileList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No profiles saved yet</p>
+            <p style="font-size: 0.9em;">Create a profile to save your search preferences</p>
+          </div>
+        `;
+        return;
+      }
+      
+      profileList.innerHTML = profiles.map((profile, index) => {
+        const isActive = currentProfile === profile.name;
+        const exp = profile.data.experience ? 
+          document.querySelector(`#experience option[value="${profile.data.experience}"]`)?.text || 'Any' : 'Any';
+        const loc = profile.data.location ? 
+          document.querySelector(`#location option[value="${profile.data.location}"]`)?.text.replace(/^[🌍📍]\s*/, '') || 'Any' : 'Any';
+        
+        return `
+          <div class="profile-item ${isActive ? 'active' : ''}" onclick="loadProfile(${index})">
+            <div class="profile-info">
+              <div class="profile-name">${profile.name}</div>
+              <div class="profile-details">${loc} • ${exp}</div>
+            </div>
+            <div class="profile-actions">
+              <button class="profile-action-btn load" onclick="event.stopPropagation(); loadProfile(${index}); closeProfileModal();">
+                📥 Load
+              </button>
+              <button class="profile-action-btn delete" onclick="event.stopPropagation(); deleteProfile(${index})">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function loadProfile(index) {
+      const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      if (profiles[index]) {
+        setProfileData(profiles[index].data);
+        currentProfile = profiles[index].name;
+        loadProfiles(); // Refresh to show active state
+      }
+    }
+    
+    function deleteProfile(index) {
+      const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      const profileName = profiles[index].name;
+      
+      if (confirm(`Delete profile "${profileName}"?`)) {
+        if (currentProfile === profileName) {
+          currentProfile = null;
+        }
+        profiles.splice(index, 1);
+        localStorage.setItem('jobProfiles', JSON.stringify(profiles));
+        loadProfiles();
       }
     }
   </script>
