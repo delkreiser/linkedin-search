@@ -358,7 +358,7 @@
     .slider-value-label {
       font-size: 0.95em;
       font-weight: 500;
-      color: var(--linkedin-blue);
+      transition: color 0.3s;
     }
     
     .range-slider {
@@ -367,7 +367,7 @@
       width: 100%;
       height: 2px;
       border-radius: 1px;
-      background: linear-gradient(to right, var(--linkedin-blue) 0%, var(--linkedin-blue) 0%, var(--border-color) 0%, var(--border-color) 100%);
+      background: linear-gradient(to right, #28a745 0%, #28a745 20%, #ffc107 20%, #ffc107 30%, #ff6b35 30%, #ff6b35 50%, #dc3545 50%, #dc3545 100%);
       outline: none;
       transition: background 0.3s;
       margin: 15px 0;
@@ -380,7 +380,7 @@
       height: 28px;
       border-radius: 50%;
       background: white;
-      border: 5px solid var(--linkedin-blue);
+      border: 5px solid #28a745;
       cursor: pointer;
       box-shadow: 0 2px 8px var(--shadow);
       transition: all 0.2s;
@@ -397,7 +397,7 @@
       height: 28px;
       border-radius: 50%;
       background: white;
-      border: 5px solid var(--linkedin-blue);
+      border: 5px solid #28a745;
       cursor: pointer;
       box-shadow: 0 2px 8px var(--shadow);
       transition: all 0.2s;
@@ -1125,9 +1125,9 @@
           <!-- Step 1: Profile Name -->
           <div class="questionnaire-step active" data-step="1">
             <div class="question-title">What would you like to name this profile?</div>
-            <input type="text" id="q-profileName" placeholder="e.g., 'Senior Remote Jobs' or 'Entry Level Tech'" style="font-size: 1.05em;">
+            <input type="text" id="q-profileName" placeholder="e.g., 'project manager' or 'python developer'" style="font-size: 1.05em;">
             <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: 10px;">
-              💡 Choose a name that describes this job search
+              💡 This will be your profile name AND your job search keywords
             </p>
           </div>
           
@@ -1266,12 +1266,45 @@
     const radiusValue = document.getElementById('radiusValue');
     
     function updateSlider() {
-      const value = radiusSlider.value;
+      const value = parseInt(radiusSlider.value);
       radiusValue.textContent = value + ' miles';
-      const min = radiusSlider.min;
-      const max = radiusSlider.max;
-      const percentage = ((value - min) / (max - min)) * 100;
-      radiusSlider.style.background = `linear-gradient(to right, var(--linkedin-blue) 0%, var(--linkedin-blue) ${percentage}%, var(--border-color) ${percentage}%, var(--border-color) 100%)`;
+      
+      // Determine color based on distance
+      let color;
+      if (value < 25) {
+        color = '#28a745'; // Green
+      } else if (value >= 25 && value <= 30) {
+        color = '#ffc107'; // Yellow
+      } else if (value >= 31 && value <= 50) {
+        color = '#ff6b35'; // Orange
+      } else {
+        color = '#dc3545'; // Red
+      }
+      
+      // Update label color
+      radiusValue.style.color = color;
+      
+      // Update thumb border color
+      radiusSlider.style.setProperty('--thumb-color', color);
+      
+      // Apply CSS variable for thumb color (for browsers that support it)
+      const style = document.createElement('style');
+      style.textContent = `
+        #radius::-webkit-slider-thumb {
+          border-color: ${color} !important;
+        }
+        #radius::-moz-range-thumb {
+          border-color: ${color} !important;
+        }
+      `;
+      
+      // Remove old style if exists
+      const oldStyle = document.getElementById('slider-dynamic-style');
+      if (oldStyle) {
+        oldStyle.remove();
+      }
+      style.id = 'slider-dynamic-style';
+      document.head.appendChild(style);
     }
     
     radiusSlider.addEventListener('input', updateSlider);
@@ -1602,7 +1635,8 @@
           experience: questionnaireData.experience,
           jobTypes: questionnaireData.jobTypes || [],
           location: questionnaireData.locationType === 'remote' ? 'Remote' : questionnaireData.geoId,
-          locationName: questionnaireData.location
+          locationName: questionnaireData.location,
+          keywords: questionnaireData.name // Store profile name as keywords
         },
         created: Date.now()
       };
@@ -1686,6 +1720,9 @@
       const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
       const profile = profiles.find(p => p.name === name);
       if (!profile) return;
+      
+      // Set keywords from profile
+      document.getElementById('keywords').value = profile.data.keywords || profile.name;
       
       // Set experience level
       document.getElementById('experience').value = profile.data.experience || '';
