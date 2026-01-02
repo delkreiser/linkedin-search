@@ -367,9 +367,9 @@
       width: 100%;
       height: 2px;
       border-radius: 1px;
-      background: linear-gradient(to right, #28a745 0%, #28a745 20%, #ffc107 20%, #ffc107 30%, #ff6b35 30%, #ff6b35 50%, #dc3545 50%, #dc3545 100%);
+      background: #ccc;
       outline: none;
-      transition: background 0.3s;
+      transition: background 0.1s;
       margin: 15px 0;
     }
     
@@ -1269,14 +1269,22 @@
       const value = parseInt(radiusSlider.value);
       radiusValue.textContent = value + ' miles';
       
+      const min = parseInt(radiusSlider.min);
+      const max = parseInt(radiusSlider.max);
+      const percentage = ((value - min) / (max - min)) * 100;
+      
       // Determine color based on distance
       let color;
       if (value < 25) {
         color = '#28a745'; // Green
       } else if (value >= 25 && value <= 30) {
-        color = '#ffc107'; // Yellow
+        // Transition from yellow to orange
+        const progress = (value - 25) / 5;
+        color = `rgb(${Math.round(255)}, ${Math.round(193 - progress * 86)}, ${Math.round(7 + progress * 46)})`;
       } else if (value >= 31 && value <= 50) {
-        color = '#ff6b35'; // Orange
+        // Transition from orange to red
+        const progress = (value - 31) / 19;
+        color = `rgb(${Math.round(255)}, ${Math.round(107 - progress * 107)}, ${Math.round(53 - progress * 53)})`;
       } else {
         color = '#dc3545'; // Red
       }
@@ -1284,10 +1292,20 @@
       // Update label color
       radiusValue.style.color = color;
       
-      // Update thumb border color
-      radiusSlider.style.setProperty('--thumb-color', color);
+      // Create smooth gradient from green through yellow, orange to red up to the current value
+      // After the current value, show grey
+      const gradient = `linear-gradient(to right, 
+        #28a745 0%, 
+        #28a745 ${Math.min(percentage, 20)}%, 
+        #ffc107 ${Math.min(percentage, 26.3)}%, 
+        #ff6b35 ${Math.min(percentage, 47.4)}%, 
+        #dc3545 ${Math.min(percentage, 100)}%, 
+        #ccc ${percentage}%, 
+        #ccc 100%)`;
       
-      // Apply CSS variable for thumb color (for browsers that support it)
+      radiusSlider.style.background = gradient;
+      
+      // Update thumb border color
       const style = document.createElement('style');
       style.textContent = `
         #radius::-webkit-slider-thumb {
