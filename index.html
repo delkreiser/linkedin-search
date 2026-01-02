@@ -850,17 +850,31 @@
           <option value="103644278">United States</option>
           <option value="102277331">San Francisco Bay Area</option>
           <option value="105080838">New York, NY</option>
+          <option value="102448103">Los Angeles, CA</option>
+          <option value="103112676">Chicago, IL</option>
           <option value="104472865">Austin, TX</option>
           <option value="104116203">Seattle, WA</option>
           <option value="103736294">Denver, CO</option>
+          <option value="100293800">Boston, MA</option>
           <option value="102597912">Boulder, CO</option>
-          <option value="105763813">Colorado</option>
           <option value="106233382">San Jose, CA</option>
-          <option value="105865430">Lexington Park, MD</option>
-          <option value="104383890">Washington DC</option>
-          <option value="103755962">Bloomington, IL</option>
-          <option value="105142920">Huntsville, AL</option>
+          <option value="104601127">Houston, TX</option>
+          <option value="105146016">Phoenix, AZ</option>
+          <option value="104937023">Philadelphia, PA</option>
+          <option value="106365502">San Antonio, TX</option>
+          <option value="106086138">San Diego, CA</option>
+          <option value="100293800">Dallas, TX</option>
           <option value="101915197">Durham, NC</option>
+          <option value="105454758">Portland, OR</option>
+          <option value="102571732">Atlanta, GA</option>
+          <option value="105116571">Nashville, TN</option>
+          <option value="105149562">Miami, FL</option>
+          <option value="104383890">Washington DC</option>
+          <option value="102095887">California</option>
+          <option value="102748797">Texas</option>
+          <option value="104050827">Florida</option>
+          <option value="105763813">Colorado</option>
+          <option value="103305169">Washington</option>
           <option value="Other">📍 Other (Enter geoId)</option>
         </select>
         
@@ -1567,21 +1581,40 @@
       const profile = profiles.find(p => p.name === name);
       if (!profile) return;
       
+      // Set experience level
       document.getElementById('experience').value = profile.data.experience || '';
+      
+      // Handle location
       if (profile.data.location === 'Remote') {
         document.getElementById('location').value = 'Remote';
         document.getElementById('distanceDiv').style.display = 'none';
       } else if (profile.data.location) {
-        document.getElementById('location').value = profile.data.location;
+        // Check if the geoId exists in the dropdown
+        const locationOption = document.querySelector(`#location option[value="${profile.data.location}"]`);
+        if (locationOption) {
+          document.getElementById('location').value = profile.data.location;
+        } else {
+          // Use "Other" and set custom geoId
+          document.getElementById('location').value = 'Other';
+          document.getElementById('customGeoId').value = profile.data.location;
+          document.getElementById('customGeoDiv').style.display = 'block';
+        }
         document.getElementById('location').dispatchEvent(new Event('change'));
       }
       
+      // Set job types and expand the Job Type section
       document.querySelectorAll('[id^="jobtype-"]').forEach(cb => cb.checked = false);
-      if (profile.data.jobTypes) {
+      if (profile.data.jobTypes && profile.data.jobTypes.length > 0) {
         profile.data.jobTypes.forEach(jt => {
           const checkbox = document.querySelector(`[id^="jobtype-"][value="${jt}"]`);
           if (checkbox) checkbox.checked = true;
         });
+        
+        // Expand the Job Type collapsible section so user can see selections
+        const jobTypeSection = document.querySelector('.collapsible-section .collapsible-header');
+        if (jobTypeSection && !jobTypeSection.classList.contains('active')) {
+          jobTypeSection.click();
+        }
       }
       
       currentProfileName = name;
