@@ -1273,11 +1273,29 @@
     
     function updateSlider() {
       const value = parseInt(radiusSlider.value);
-      radiusValue.textContent = value + ' miles';
       
       const min = parseInt(radiusSlider.min);
       const max = parseInt(radiusSlider.max);
       const percentage = ((value - min) / (max - min)) * 100;
+      
+      // Determine fun message based on distance
+      let message = '';
+      if (value >= 5 && value <= 10) {
+        message = 'The Unicorn 🦄';
+      } else if (value >= 15 && value <= 20) {
+        message = 'The easy commute 😎';
+      } else if (value >= 25 && value <= 35) {
+        message = 'Time to listen to podcasts! 🎙️';
+      } else if (value >= 40 && value <= 50) {
+        message = 'The Danger Zone ⚠️';
+      } else if (value >= 55 && value <= 65) {
+        message = 'Are you sure? 🥴';
+      } else if (value >= 70 && value <= 100) {
+        message = 'The Pain Cave ☠️';
+      }
+      
+      // Update label with miles and message
+      radiusValue.textContent = `${value} miles - ${message}`;
       
       // Smooth label color transition based on distance
       let labelColor;
