@@ -865,8 +865,10 @@
       <!-- Control Buttons -->
       <div class="header-controls">
         <button class="icon-button profile-btn" onclick="openProfileModal()">👤 Manage Profiles</button>
-        <button class="icon-button" onclick="toggleTheme()">🌓 Theme</button>
-        <button class="icon-button" onclick="clearForm()">🔄 Clear</button>
+        <div style="display: flex; gap: 10px; flex: 1; min-width: 200px;">
+          <button class="icon-button" onclick="toggleTheme()" style="flex: 1;">🌓 Theme</button>
+          <button class="icon-button" onclick="clearForm()" style="flex: 1;">🔄 Clear</button>
+        </div>
       </div>
       
       <!-- Active Profile Banner -->
@@ -875,18 +877,21 @@
           <div class="profile-banner-title">🎯 Active Profile</div>
           <div id="profileBannerDetails" class="profile-banner-details"></div>
         </div>
-        <button class="profile-banner-close" onclick="clearProfile()">×</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button onclick="editActiveProfile()" style="background: none; border: none; color: #ffa500; cursor: pointer; font-size: 1.1em; padding: 5px 10px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">✏️</button>
+          <button class="profile-banner-close" onclick="clearProfile()">×</button>
+        </div>
       </div>
       
       <!-- Quick Action Buttons -->
       <div class="quick-actions">
-        <button class="quick-action-btn" onclick="quickSearch('24h')">
-          <div class="quick-action-icon">⏰</div>
-          <div class="quick-action-label">Past 24 Hours</div>
-        </button>
         <button class="quick-action-btn" onclick="quickSearch('8h')">
           <div class="quick-action-icon">🔥</div>
           <div class="quick-action-label">Past 8 Hours</div>
+        </button>
+        <button class="quick-action-btn" onclick="quickSearch('24h')">
+          <div class="quick-action-icon">⏰</div>
+          <div class="quick-action-label">Past 24 Hours</div>
         </button>
         <button class="quick-action-btn" onclick="quickSearch('under10')">
           <div class="quick-action-icon">👥</div>
@@ -1735,7 +1740,7 @@
       const profile = profiles.find(p => p.name === name);
       if (!profile) return;
       
-      // Set keywords from profile
+      // Set keywords from profile (only the keywords, not location)
       document.getElementById('keywords').value = profile.data.keywords || profile.name;
       
       // Set experience level
@@ -1759,19 +1764,13 @@
         document.getElementById('location').dispatchEvent(new Event('change'));
       }
       
-      // Set job types and expand the Job Type section
+      // Set job types but DON'T expand the section
       document.querySelectorAll('[id^="jobtype-"]').forEach(cb => cb.checked = false);
       if (profile.data.jobTypes && profile.data.jobTypes.length > 0) {
         profile.data.jobTypes.forEach(jt => {
           const checkbox = document.querySelector(`[id^="jobtype-"][value="${jt}"]`);
           if (checkbox) checkbox.checked = true;
         });
-        
-        // Expand the Job Type collapsible section so user can see selections
-        const jobTypeSection = document.querySelector('.collapsible-section .collapsible-header');
-        if (jobTypeSection && !jobTypeSection.classList.contains('active')) {
-          jobTypeSection.click();
-        }
       }
       
       currentProfileName = name;
@@ -1894,6 +1893,20 @@
       localStorage.removeItem('activeProfile');
       updateProfileBanner();
       loadProfiles();
+      
+      // Also clear the form
+      clearForm();
+    }
+    
+    function editActiveProfile() {
+      if (!currentProfileName) return;
+      
+      const profiles = JSON.parse(localStorage.getItem('jobProfiles') || '[]');
+      const profileIndex = profiles.findIndex(p => p.name === currentProfileName);
+      
+      if (profileIndex !== -1) {
+        editProfile(profileIndex);
+      }
     }
     
     function loadActiveProfile() {
