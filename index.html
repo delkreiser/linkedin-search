@@ -365,8 +365,8 @@
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 2px;
-      border-radius: 1px;
+      height: 6px;
+      border-radius: 3px;
       background: #ccc;
       outline: none;
       transition: background 0.1s;
@@ -379,11 +379,11 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: white;
-      border: 5px solid #28a745;
+      background: #e0e0e0;
+      border: 5px solid var(--linkedin-blue);
       cursor: pointer;
       box-shadow: 0 2px 8px var(--shadow);
-      transition: all 0.2s;
+      transition: transform 0.2s;
       margin-top: 0;
     }
     
@@ -396,11 +396,11 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: white;
-      border: 5px solid #28a745;
+      background: #e0e0e0;
+      border: 5px solid var(--linkedin-blue);
       cursor: pointer;
       box-shadow: 0 2px 8px var(--shadow);
-      transition: all 0.2s;
+      transition: transform 0.2s;
     }
     
     .range-slider::-moz-range-thumb:hover {
@@ -409,8 +409,9 @@
     }
     
     .range-slider::-moz-range-track {
-      height: 2px;
+      height: 6px;
       background: transparent;
+      border-radius: 3px;
     }
     
     .slider-labels {
@@ -1273,56 +1274,51 @@
       const max = parseInt(radiusSlider.max);
       const percentage = ((value - min) / (max - min)) * 100;
       
-      // Determine color based on distance
-      let color;
-      if (value < 25) {
-        color = '#28a745'; // Green
-      } else if (value >= 25 && value <= 30) {
+      // Smooth label color transition based on distance
+      let labelColor;
+      if (percentage <= 25) {
+        labelColor = '#28a745'; // Green
+      } else if (percentage > 25 && percentage <= 50) {
+        // Transition from green to yellow
+        const progress = (percentage - 25) / 25;
+        const r = Math.round(40 + (255 - 40) * progress);
+        const g = Math.round(167 + (193 - 167) * progress);
+        const b = Math.round(69 + (7 - 69) * progress);
+        labelColor = `rgb(${r}, ${g}, ${b})`;
+      } else if (percentage > 50 && percentage <= 75) {
         // Transition from yellow to orange
-        const progress = (value - 25) / 5;
-        color = `rgb(${Math.round(255)}, ${Math.round(193 - progress * 86)}, ${Math.round(7 + progress * 46)})`;
-      } else if (value >= 31 && value <= 50) {
-        // Transition from orange to red
-        const progress = (value - 31) / 19;
-        color = `rgb(${Math.round(255)}, ${Math.round(107 - progress * 107)}, ${Math.round(53 - progress * 53)})`;
+        const progress = (percentage - 50) / 25;
+        const r = 255;
+        const g = Math.round(193 - (193 - 107) * progress);
+        const b = Math.round(7 + (53 - 7) * progress);
+        labelColor = `rgb(${r}, ${g}, ${b})`;
       } else {
-        color = '#dc3545'; // Red
+        // Transition from orange to red
+        const progress = (percentage - 75) / 25;
+        const r = 255;
+        const g = Math.round(107 * (1 - progress));
+        const b = Math.round(53 - 53 * progress);
+        labelColor = `rgb(${r}, ${g}, ${b})`;
       }
       
       // Update label color
-      radiusValue.style.color = color;
+      radiusValue.style.color = labelColor;
       
-      // Create smooth gradient from green through yellow, orange to red up to the current value
-      // After the current value, show grey
-      const gradient = `linear-gradient(to right, 
+      // Create smooth equal gradient from green → yellow → orange → red up to current value
+      // Then grey for the rest
+      // Equal distribution: 0-25%, 25-50%, 50-75%, 75-100%
+      const gradientStops = `
         #28a745 0%, 
-        #28a745 ${Math.min(percentage, 20)}%, 
-        #ffc107 ${Math.min(percentage, 26.3)}%, 
-        #ff6b35 ${Math.min(percentage, 47.4)}%, 
+        #28a745 ${Math.min(percentage, 25)}%, 
+        #ffc107 ${Math.min(percentage, 50)}%, 
+        #ff6b35 ${Math.min(percentage, 75)}%, 
         #dc3545 ${Math.min(percentage, 100)}%, 
         #ccc ${percentage}%, 
-        #ccc 100%)`;
-      
-      radiusSlider.style.background = gradient;
-      
-      // Update thumb border color
-      const style = document.createElement('style');
-      style.textContent = `
-        #radius::-webkit-slider-thumb {
-          border-color: ${color} !important;
-        }
-        #radius::-moz-range-thumb {
-          border-color: ${color} !important;
-        }
+        #ccc 100%
       `;
       
-      // Remove old style if exists
-      const oldStyle = document.getElementById('slider-dynamic-style');
-      if (oldStyle) {
-        oldStyle.remove();
-      }
-      style.id = 'slider-dynamic-style';
-      document.head.appendChild(style);
+      const gradient = `linear-gradient(to right, ${gradientStops})`;
+      radiusSlider.style.background = gradient;
     }
     
     radiusSlider.addEventListener('input', updateSlider);
