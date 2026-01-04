@@ -1685,10 +1685,18 @@
       
       const finalUrl = `https://www.linkedin.com/jobs/search/?${timeParam}${geoParam}${distanceParam}${f_C_param}${f_EA_param}${f_AL_param}${f_JIYN_param}${f_JC_param}${f_WT_param}${f_E_param}${f_JT_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
       
-      // Mobile-friendly: Try window.open, fallback to location.href
-      const newWindow = window.open(finalUrl, '_blank');
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Try to open LinkedIn app on mobile, fallback to browser
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // Try app deep link first
         window.location.href = finalUrl;
+      } else {
+        // Desktop: open in new tab
+        const newWindow = window.open(finalUrl, '_blank');
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+          window.location.href = finalUrl;
+        }
       }
     }
     
@@ -2175,10 +2183,18 @@
       
       const finalUrl = `https://www.linkedin.com/jobs/search/?${timeParam}${geoParam}${distanceParam}${f_C_param}${f_EA_param}${f_AL_param}${f_JIYN_param}${f_JC_param}${f_WT_param}${f_E_param}${f_JT_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
       
-      // Mobile-friendly: Try window.open, fallback to location.href
-      const newWindow = window.open(finalUrl, '_blank');
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Try to open LinkedIn app on mobile, fallback to browser
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // Try app deep link first
         window.location.href = finalUrl;
+      } else {
+        // Desktop: open in new tab
+        const newWindow = window.open(finalUrl, '_blank');
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+          window.location.href = finalUrl;
+        }
       }
     }
     
