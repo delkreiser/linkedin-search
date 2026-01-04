@@ -158,13 +158,14 @@
       gap: 10px;
       margin-bottom: 20px;
       flex-wrap: wrap;
+      align-items: stretch;
     }
     
     .icon-button {
       background: var(--bg-primary);
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 8px 12px;
+      padding: 6px 10px;
       cursor: pointer;
       font-size: 0.85em;
       color: var(--text-primary) !important;
@@ -931,8 +932,19 @@
       .checkbox-group { grid-template-columns: 1fr; }
       .toggle-table { grid-template-columns: 1fr; }
       .button-container { flex-direction: column; }
-      .header-controls { flex-direction: column; }
-      .icon-button { min-width: auto; }
+      .header-controls { 
+        justify-content: center;
+        gap: 8px;
+      }
+      .icon-button { 
+        min-width: auto;
+        font-size: 0.8em;
+        padding: 6px 8px;
+      }
+      .icon-button.profile-btn {
+        flex: 2;
+        min-width: 140px;
+      }
     }
   </style>
 </head>
@@ -971,11 +983,9 @@
     <div class="content">
       <!-- Control Buttons -->
       <div class="header-controls">
-        <button class="icon-button profile-btn" onclick="openProfileModal()">👤 Manage Profiles</button>
-        <div style="display: flex; gap: 10px; flex: 1; min-width: 200px;">
-          <button class="icon-button" onclick="toggleTheme()" style="flex: 1;">🌓 Dark Mode</button>
-          <button class="icon-button" onclick="clearForm()" style="flex: 1;">🔄 Clear</button>
-        </div>
+        <button class="icon-button profile-btn" onclick="openProfileModal()" style="flex: 2; min-width: 150px;">👤 Manage Profiles</button>
+        <button class="icon-button" onclick="toggleTheme()" style="flex: 1; min-width: 95px; white-space: nowrap;">🌓 Dark Mode</button>
+        <button class="icon-button" onclick="clearForm()" style="flex: 1; min-width: 80px;">🔄 Clear</button>
       </div>
       
       <!-- Active Profile Banner -->
