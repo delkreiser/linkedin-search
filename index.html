@@ -68,84 +68,28 @@
       object-fit: cover;
     }
     
-    /* Flip Card Styles */
-    .flip-card {
-      perspective: 1000px;
-      -webkit-perspective: 1000px;
-      width: 100%;
-      height: 200px;
-      cursor: pointer;
-      position: relative;
-    }
-    
-    .flip-card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s;
-      -webkit-transition: -webkit-transform 0.6s;
-      transform-style: preserve-3d;
-      -webkit-transform-style: preserve-3d;
-    }
-    
-    .flip-card.flipped .flip-card-inner {
-      transform: rotateY(180deg);
-      -webkit-transform: rotateY(180deg);
-    }
-    
-    .flip-card-front,
-    .flip-card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      -moz-backface-visibility: hidden;
-      top: 0;
-      left: 0;
-    }
-    
-    .flip-card-front {
-      z-index: 2;
-      transform: rotateY(0deg);
-      -webkit-transform: rotateY(0deg);
-    }
-    
-    .flip-card-back {
-      transform: rotateY(180deg);
-      -webkit-transform: rotateY(180deg);
-      background: linear-gradient(135deg, var(--linkedin-blue), #005582);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 15px 20px;
+    /* Header Banner Styles */
+    .header-banner {
+      background: linear-gradient(135deg, #0073b1, #005582);
+      padding: 40px 20px;
       text-align: center;
-      overflow: hidden;
-      z-index: 1;
     }
     
-    .credits-title {
-      font-size: 1.3em;
+    .header-title {
+      color: white;
+      font-size: 2em;
       font-weight: 700;
-      margin-bottom: 10px;
-      line-height: 1.2;
+      margin: 0;
+      letter-spacing: -0.5px;
     }
     
-    .credits-content {
-      font-size: 0.85em;
-      line-height: 1.5;
-      max-width: 500px;
-    }
-    
-    .credits-content p {
-      margin: 6px 0;
-    }
-    
-    .credits-emoji {
-      font-size: 1.5em;
-      margin-bottom: 5px;
+    @media (max-width: 600px) {
+      .header-banner {
+        padding: 30px 15px;
+      }
+      .header-title {
+        font-size: 1.5em;
+      }
     }
     
     .content {
@@ -951,33 +895,9 @@
 <body data-theme="light">
   
   <div class="container">
-    <!-- Flip Card Header -->
-    <div class="flip-card" id="headerFlipCard" onclick="flipCard()">
-      <div class="flip-card-inner">
-        <!-- Front - Header Image -->
-        <div class="flip-card-front">
-          <picture>
-            <source media="(max-width: 767px)" srcset="img/header-300x200.jpg">
-            <source media="(min-width: 768px)" srcset="img/header-1800x600.jpg">
-            <img class="header-img" src="img/header-1800x600.jpg" alt="Header Image">
-          </picture>
-        </div>
-        
-        <!-- Back - Credits/About -->
-        <div class="flip-card-back">
-          <div class="credits-title">LinkedIn Job Search Tool</div>
-          <div class="credits-content">
-            <p><strong>Created with ❤️ for job seekers everywhere</strong></p>
-            <p>Built to help you find your perfect opportunity faster</p>
-            <p style="margin-top: 10px; font-size: 0.8em; opacity: 0.9;">
-              💡 Tip: Create profiles to save your search preferences
-            </p>
-            <p style="margin-top: 8px; font-size: 0.75em; opacity: 0.8;">
-              Tap again to return
-            </p>
-          </div>
-        </div>
-      </div>
+    <!-- Header Banner -->
+    <div class="header-banner">
+      <h1 class="header-title">LinkedIn Job Search Tool</h1>
     </div>
     
     <div class="content">
@@ -1375,12 +1295,6 @@
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
       body.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
-    }
-    
-    // Flip Card
-    function flipCard() {
-      const flipCard = document.getElementById('headerFlipCard');
-      flipCard.classList.toggle('flipped');
     }
     
     window.addEventListener('DOMContentLoaded', () => {
