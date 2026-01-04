@@ -167,7 +167,7 @@
       padding: 8px 12px;
       cursor: pointer;
       font-size: 0.85em;
-      color: var(--text-primary);
+      color: var(--text-primary) !important;
       transition: all 0.2s;
       flex: 1;
       min-width: 100px;
@@ -175,7 +175,7 @@
     
     .icon-button:hover {
       background: var(--linkedin-blue);
-      color: white;
+      color: white !important;
       border-color: var(--linkedin-blue);
     }
     
@@ -973,7 +973,7 @@
       <div class="header-controls">
         <button class="icon-button profile-btn" onclick="openProfileModal()">👤 Manage Profiles</button>
         <div style="display: flex; gap: 10px; flex: 1; min-width: 200px;">
-          <button class="icon-button" onclick="toggleTheme()" style="flex: 1;">🌓 Theme</button>
+          <button class="icon-button" onclick="toggleTheme()" style="flex: 1;">🌓 Dark Mode</button>
           <button class="icon-button" onclick="clearForm()" style="flex: 1;">🔄 Clear</button>
         </div>
       </div>
@@ -1772,9 +1772,17 @@
       document.getElementById('summary-name').textContent = questionnaireData.name;
       const expText = document.querySelector(`#experienceOptions .option-card.selected .option-text`)?.textContent || 'Not selected';
       document.getElementById('summary-experience').textContent = expText;
+      
       const jobTypeLabels = {'F': 'Full-time', 'P': 'Part-time', 'C': 'Contract', 'T': 'Temporary', 'I': 'Internship', 'V': 'Volunteer'};
-      const jobTypeText = questionnaireData.jobTypes?.map(jt => jobTypeLabels[jt]).join(', ') || 'Not selected';
+      let jobTypeText = 'Not selected';
+      if (questionnaireData.jobTypes && questionnaireData.jobTypes.length > 0) {
+        const types = questionnaireData.jobTypes
+          .filter(jt => jt && jobTypeLabels[jt]) // Filter out empty/undefined values
+          .map(jt => jobTypeLabels[jt]);
+        jobTypeText = types.length > 0 ? types.join(', ') : 'Not selected';
+      }
       document.getElementById('summary-jobtype').textContent = jobTypeText;
+      
       document.getElementById('summary-location').textContent = questionnaireData.location || 'Not selected';
     }
     
