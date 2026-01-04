@@ -818,6 +818,7 @@
     
     .quick-action-icon {
       font-size: 1.8em;
+      pointer-events: none;
     }
     
     .quick-action-label {
@@ -825,6 +826,7 @@
       font-weight: 600;
       line-height: 1.2;
       color: inherit;
+      pointer-events: none;
     }
     
     @media (min-width: 768px) {
@@ -1155,6 +1157,10 @@
         </div><!-- End collapsible-content -->
       </div><!-- End collapsible-section -->
       
+        </div><!-- End settings-expanded -->
+      </div><!-- End settings-toggle-section -->
+      
+      <!-- Distance Section (Always Visible) -->
       <div class="section" id="distanceDiv">
         <label class="section-title" for="radius">Distance</label>
         <div class="slider-container">
@@ -1171,9 +1177,6 @@
           </div>
         </div>
       </div>
-      
-        </div><!-- End settings-expanded -->
-      </div><!-- End settings-toggle-section -->
       
       <!-- Time & Sort Section -->
       <div class="collapsible-section">
@@ -1682,7 +1685,11 @@
       
       const finalUrl = `https://www.linkedin.com/jobs/search/?${timeParam}${geoParam}${distanceParam}${f_C_param}${f_EA_param}${f_AL_param}${f_JIYN_param}${f_JC_param}${f_WT_param}${f_E_param}${f_JT_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
       
-      window.open(finalUrl, '_blank');
+      // Mobile-friendly: Try window.open, fallback to location.href
+      const newWindow = window.open(finalUrl, '_blank');
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        window.location.href = finalUrl;
+      }
     }
     
     // Profile Modal
@@ -2168,7 +2175,11 @@
       
       const finalUrl = `https://www.linkedin.com/jobs/search/?${timeParam}${geoParam}${distanceParam}${f_C_param}${f_EA_param}${f_AL_param}${f_JIYN_param}${f_JC_param}${f_WT_param}${f_E_param}${f_JT_param}&keywords=${keywords}${locationParam}&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true&sortBy=${sort}`;
       
-      window.open(finalUrl, '_blank');
+      // Mobile-friendly: Try window.open, fallback to location.href
+      const newWindow = window.open(finalUrl, '_blank');
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        window.location.href = finalUrl;
+      }
     }
     
     function clearProfile() {
