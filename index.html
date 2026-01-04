@@ -115,7 +115,8 @@
       color: var(--text-primary) !important;
       transition: all 0.2s;
       flex: 1;
-      min-width: 100px;
+      min-width: 80px;
+      white-space: nowrap;
     }
     
     .icon-button:hover {
@@ -130,6 +131,7 @@
       border-color: var(--success);
       font-weight: 600;
       flex: 2;
+      min-width: 150px;
     }
     
     .icon-button.profile-btn:hover {
@@ -567,13 +569,14 @@
     }
     
     .modal-btn {
-      padding: 10px 20px;
+      padding: 8px 16px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.95em;
+      font-size: 0.9em;
       transition: all 0.2s;
       font-weight: 500;
+      white-space: nowrap;
     }
     
     .modal-btn-primary {
@@ -994,9 +997,9 @@
     <div class="content">
       <!-- Control Buttons -->
       <div class="header-controls">
-        <button id="profilesButton" class="icon-button profile-btn" onclick="openProfileModal()" style="flex: 2; min-width: 150px;">👤 Create a Profile</button>
-        <button class="icon-button" onclick="toggleTheme()" style="flex: 1; min-width: 95px; white-space: nowrap;">🌓 Dark Mode</button>
-        <button class="icon-button" onclick="clearForm()" style="flex: 1; min-width: 80px;">🔄 Clear</button>
+        <button id="profilesButton" class="icon-button profile-btn" onclick="openProfileModal()">👤 Create a Profile</button>
+        <button class="icon-button" onclick="toggleTheme()">🌓 Dark Mode</button>
+        <button class="icon-button" onclick="clearForm()">🔄 Clear</button>
       </div>
       
       <!-- Active Profile Banner -->
@@ -1352,11 +1355,11 @@
         <div id="listViewFooter" style="width: 100%; display: flex; justify-content: flex-end;">
           <button class="modal-btn modal-btn-secondary" onclick="closeProfileModal()">Close</button>
         </div>
-        <div id="questionnaireFooter" style="display: none; width: 100%;">
-          <button class="modal-btn modal-btn-secondary" onclick="previousStep()" id="prevBtn" style="display: none;">← Back</button>
+        <div id="questionnaireFooter" style="display: none; width: 100%; display: flex; gap: 10px; align-items: center;">
+          <button class="modal-btn modal-btn-secondary" onclick="previousStep()" id="prevBtn" style="display: none; flex-shrink: 0;">← Back</button>
           <div style="flex: 1;"></div>
-          <button class="modal-btn modal-btn-primary" onclick="nextStep()" id="nextBtn">Next →</button>
-          <button class="modal-btn modal-btn-success" onclick="saveProfile()" id="saveBtn" style="display: none;">💾 Save Profile</button>
+          <button class="modal-btn modal-btn-primary" onclick="nextStep()" id="nextBtn" style="flex-shrink: 0;">Next →</button>
+          <button class="modal-btn modal-btn-success" onclick="saveProfile()" id="saveBtn" style="display: none; flex-shrink: 0;">💾 Save Profile</button>
         </div>
       </div>
     </div>
