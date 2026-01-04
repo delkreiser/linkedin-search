@@ -440,11 +440,16 @@
     }
     
     .slider-labels {
-      display: flex;
-      justify-content: space-between;
+      position: relative;
+      width: 100%;
       margin-top: 5px;
       font-size: 0.75em;
       color: var(--text-secondary);
+      height: 15px;
+    }
+    
+    .slider-labels span {
+      white-space: nowrap;
     }
     
     .button-container {
@@ -852,7 +857,7 @@
       max-height: 200px;
       overflow-y: auto;
       box-shadow: 0 4px 12px var(--shadow);
-      z-index: 10;
+      z-index: 100;
       display: none;
     }
     
@@ -1008,12 +1013,13 @@
           <div class="slider-value">
             <span id="radiusValue" class="slider-value-label">25 miles</span>
           </div>
-          <input type="range" id="radius" class="range-slider" min="5" max="100" value="25" step="5">
+          <input type="range" id="radius" class="range-slider" min="0" max="100" value="25" step="5">
           <div class="slider-labels">
-            <span>5 mi</span>
-            <span>25 mi</span>
-            <span>50 mi</span>
-            <span>100 mi</span>
+            <span style="position: absolute; left: 0%; transform: translateX(0);">0 mi</span>
+            <span style="position: absolute; left: 25%; transform: translateX(-50%);">25 mi</span>
+            <span style="position: absolute; left: 50%; transform: translateX(-50%);">50 mi</span>
+            <span style="position: absolute; left: 75%; transform: translateX(-50%);">75 mi</span>
+            <span style="position: absolute; left: 100%; transform: translateX(-100%);">100 mi</span>
           </div>
         </div>
       </div>
@@ -1199,7 +1205,7 @@
               <div class="option-text">📍 Specific City or State</div>
             </div>
             
-            <div id="customLocationInput" style="display: none; margin-top: 20px;">
+            <div id="customLocationInput" style="display: none; margin-top: 20px; padding-bottom: 150px;">
               <label class="section-title">Enter your city or state</label>
               <div class="location-input-container">
                 <input type="text" id="q-locationSearch" placeholder="Start typing..." oninput="searchLocations(this.value)">
@@ -1315,28 +1321,50 @@
       const max = parseInt(radiusSlider.max);
       const percentage = ((value - min) / (max - min)) * 100;
       
-      // Determine fun message based on distance
-      let message = '';
-      if (value >= 5 && value <= 10) {
-        message = 'The Unicorn 🦄';
-      } else if (value >= 15 && value <= 20) {
-        message = 'The easy commute 😎';
-      } else if (value >= 25 && value <= 35) {
-        message = 'Time to listen to podcasts! 🎙️';
-      } else if (value >= 40 && value <= 50) {
-        message = 'The Danger Zone ⚠️';
-      } else if (value >= 55 && value <= 65) {
-        message = 'Are you sure? 🥴';
-      } else if (value >= 70 && value <= 100) {
-        message = 'The Pain Cave ☠️';
+      // Auto-set location to Remote when slider is at 0
+      if (value === 0) {
+        const locationSelect = document.getElementById('location');
+        if (locationSelect.value !== 'Remote') {
+          locationSelect.value = 'Remote';
+          locationSelect.dispatchEvent(new Event('change'));
+        }
       }
       
-      // Update label with miles and message
-      radiusValue.textContent = `${value} miles - ${message}`;
+      // Determine fun message based on distance
+      let message = '';
+      let displayText = '';
+      
+      if (value === 0) {
+        displayText = 'Remote 🏝️';
+      } else {
+        // Determine fun message for non-remote distances
+        if (value >= 5 && value <= 10) {
+          message = 'The Unicorn 🦄';
+        } else if (value >= 15 && value <= 20) {
+          message = 'The easy commute 😎';
+        } else if (value >= 25 && value <= 35) {
+          message = 'Time to listen to podcasts! 🎙️';
+        } else if (value >= 40 && value <= 50) {
+          message = 'The Danger Zone ⚠️';
+        } else if (value >= 55 && value <= 65) {
+          message = 'Are you sure? 🥴';
+        } else if (value >= 70 && value <= 75) {
+          message = 'This is kinda long 🥵';
+        } else if (value >= 80 && value <= 100) {
+          message = 'Run away! ☠️';
+        }
+        
+        displayText = message ? `${value} miles - ${message}` : `${value} miles`;
+      }
+      
+      // Update label with display text
+      radiusValue.textContent = displayText;
       
       // Smooth label color transition based on distance
       let labelColor;
-      if (percentage <= 25) {
+      if (value === 0) {
+        labelColor = '#0073b1'; // LinkedIn blue for remote
+      } else if (percentage <= 25) {
         labelColor = '#28a745'; // Green
       } else if (percentage > 25 && percentage <= 50) {
         // Transition from green to yellow
@@ -1364,20 +1392,25 @@
       // Update label color
       radiusValue.style.color = labelColor;
       
-      // Create smooth equal gradient from green → yellow → orange → red up to current value
-      // Then grey for the rest
-      // Equal distribution: 0-25%, 25-50%, 50-75%, 75-100%
-      const gradientStops = `
-        #28a745 0%, 
-        #28a745 ${Math.min(percentage, 25)}%, 
-        #ffc107 ${Math.min(percentage, 50)}%, 
-        #ff6b35 ${Math.min(percentage, 75)}%, 
-        #dc3545 ${Math.min(percentage, 100)}%, 
-        #ccc ${percentage}%, 
-        #ccc 100%
-      `;
+      // Create smooth gradient
+      let gradient;
+      if (value === 0) {
+        // All grey when at Remote
+        gradient = `linear-gradient(to right, #ccc 0%, #ccc 100%)`;
+      } else {
+        // Gradient from start up to current value, then grey
+        const gradientStops = `
+          #28a745 0%, 
+          #28a745 ${Math.min(percentage, 25)}%, 
+          #ffc107 ${Math.min(percentage, 50)}%, 
+          #ff6b35 ${Math.min(percentage, 75)}%, 
+          #dc3545 ${Math.min(percentage, 100)}%, 
+          #ccc ${percentage}%, 
+          #ccc 100%
+        `;
+        gradient = `linear-gradient(to right, ${gradientStops})`;
+      }
       
-      const gradient = `linear-gradient(to right, ${gradientStops})`;
       radiusSlider.style.background = gradient;
     }
     
@@ -1442,7 +1475,8 @@
       }
       
       const radiusValue = document.getElementById('radius').value;
-      const distanceParam = radiusValue ? `&distance=${radiusValue}` : '';
+      // Don't include distance parameter if slider is at 0 (Remote)
+      const distanceParam = (radiusValue && radiusValue !== '0') ? `&distance=${radiusValue}` : '';
       const locationParam = (locationValue && locationValue !== "Remote" && locationValue !== "Other") 
         ? `&location=${encodeURIComponent(locationText)}` 
         : '';
@@ -1909,7 +1943,8 @@
       }
       
       const radiusValue = document.getElementById('radius').value;
-      const distanceParam = radiusValue ? `&distance=${radiusValue}` : '';
+      // Don't include distance parameter if slider is at 0 (Remote)
+      const distanceParam = (radiusValue && radiusValue !== '0') ? `&distance=${radiusValue}` : '';
       const locationParam = (locationValue && locationValue !== "Remote" && locationValue !== "Other") 
         ? `&location=${encodeURIComponent(locationText)}` 
         : '';
@@ -1968,6 +2003,9 @@
       const profileIndex = profiles.findIndex(p => p.name === currentProfileName);
       
       if (profileIndex !== -1) {
+        // Open the modal first
+        openProfileModal();
+        // Then edit the profile
         editProfile(profileIndex);
       }
     }
