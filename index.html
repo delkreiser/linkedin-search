@@ -1533,8 +1533,16 @@
           message = 'Are you sure? 🥴';
         } else if (value >= 70 && value <= 75) {
           message = 'This is kinda long 🥵';
-        } else if (value >= 80 && value <= 100) {
-          message = 'Run away! ☠️';
+        } else if (value === 80) {
+          message = "It's not worth it! 😱";
+        } else if (value === 85) {
+          message = "Are we there yet? 😵‍💫";
+        } else if (value === 90) {
+          message = "Just say no! 🙅";
+        } else if (value === 95) {
+          message = "I beg you, don't! 🛑";
+        } else if (value === 100) {
+          message = "I tried ☠️";
         }
         
         displayText = message ? `${value} miles - ${message}` : `${value} miles`;
